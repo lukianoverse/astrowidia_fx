@@ -10,7 +10,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox minHeight="400" minWidth="500.0" prefHeight="400.0" prefWidth="500.0" spacing="15.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swetophor.astrowidja.fx.MainController">
+<VBox minHeight="400" minWidth="500.0" prefHeight="400.0" prefWidth="500.0" spacing="15.0"
+      xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="astrowidja.fx.MainController">
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
     </padding>
@@ -29,12 +31,14 @@
         <Spinner fx:id="hourSetter" prefWidth="70.0" />
         <Label text=":" />
         <Spinner fx:id="minuteSetter" prefWidth="70.0" />
-        <ComboBox fx:id="timezoneSelector" maxWidth="250" minHeight="-Infinity" minWidth="180" prefWidth="180" HBox.hgrow="ALWAYS">
+        <ComboBox fx:id="timezoneSelector" maxWidth="250" minHeight="-Infinity" minWidth="180" prefWidth="180"
+                  HBox.hgrow="ALWAYS">
             <HBox.margin>
                 <Insets left="15.0" />
             </HBox.margin>
         </ComboBox>
     </HBox>
 
-    <TextArea fx:id="resultTextArea" editable="false" prefHeight="310.0" prefWidth="470.0" style="-fx-font-family: 'Courier New';" VBox.vgrow="ALWAYS" />
+    <TextArea fx:id="resultTextArea" editable="false" prefHeight="310.0" prefWidth="470.0"
+              style="-fx-font-family: 'Courier New';" VBox.vgrow="ALWAYS" />
 </VBox>

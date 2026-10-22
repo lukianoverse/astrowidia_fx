@@ -1,4 +1,4 @@
-package org.swetophor.astrowidja;
+package astrowidja;
 
 import javafx.application.Application;
 

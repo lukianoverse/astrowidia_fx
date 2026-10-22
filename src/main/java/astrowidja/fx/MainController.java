@@ -1,9 +1,10 @@
-package org.swetophor.astrowidja.fx;
+package astrowidja.fx;
 
+import astrowidja.provider.AstroDataProvider;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import org.swetophor.astrowidja.provider.AstroDataProvider;
+import astrowidja.core.AppContext;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,13 +13,14 @@ import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import javafx.util.StringConverter;
 
 import static swisseph.SweConst.*;
 
 public class MainController {
 
-    private final AstroDataProvider dataProvider = new AstroDataProvider();
+    private final AppContext appContext = AppContext.getInstance();
+    private final AstroDataProvider dataProvider = appContext.getDataProvider();
     // минимальный набор планет для MVP
     private final Map<String, Integer> targetPlanets = new LinkedHashMap<>();
 
@@ -51,10 +53,34 @@ public class MainController {
         LocalTime now = LocalTime.now();
 
         // Часы (0-23), по умолчанию текущие
-        hourSetter.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, now.getHour()));
+        SpinnerValueFactory.IntegerSpinnerValueFactory hoursFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, now.getHour());
+        hoursFactory.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Integer value) {
+                return String.format("%02d", value);
+            }
+            @Override
+            public Integer fromString(String string) {
+                return Integer.parseInt(string);
+            }
+        });
+        hourSetter.setValueFactory(hoursFactory);
 
         // Минуты (0-59), по умолчанию текущие
-        minuteSetter.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, now.getMinute()));
+        SpinnerValueFactory.IntegerSpinnerValueFactory minutesFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, now.getMinute());
+        minutesFactory.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Integer value) {
+                return String.format("%02d", value);
+            }
+            @Override
+            public Integer fromString(String string) {
+                return Integer.parseInt(string);
+            }
+        });
+        minuteSetter.setValueFactory(minutesFactory);
 
         // Перечень часовых поясов
         List<String> zones = ZoneId.getAvailableZoneIds().stream()
@@ -105,6 +131,7 @@ public class MainController {
         for (Map.Entry<String, Integer> entry : targetPlanets.entrySet()) {
             String planetName = entry.getKey();
             int planetId = entry.getValue();
+
             var result = dataProvider.getPlanetEphemeris(selectedDate, localTime, planetId);
 
             if (result.isCompleted()) { // Если расчёт выполнен (с замечаниями или без)

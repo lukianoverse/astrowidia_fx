@@ -1,4 +1,4 @@
-package org.swetophor.astrowidja.provider;
+package astrowidja.provider;
 
 import swisseph.SweConst;
 import swisseph.SweDate;

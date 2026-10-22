@@ -1,7 +1,4 @@
-package org.swetophor.astrowidja.provider;
-
-import java.time.ZoneId;
-import java.util.List;
+package astrowidja.provider;
 
 public record SweCalcResult(
         int status, // -1 для ошибки, 0 для успеха, 1 и т.д. для предупреждений
