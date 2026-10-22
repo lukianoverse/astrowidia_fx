@@ -14,6 +14,8 @@ public class AWApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("АстроВидья");
         stage.setScene(scene);
+        stage.setMinWidth(500);
+        stage.setMinHeight(400);
         stage.show();
     }
 }

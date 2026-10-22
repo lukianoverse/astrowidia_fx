@@ -2,20 +2,39 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400.0" prefWidth="450.0" spacing="15.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swetophor.astrowidja.fx.MainController">
-<padding>
-    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-</padding>
-<HBox alignment="CENTER_LEFT" spacing="10.0">
-    <Label fx:id="prompt" text="Выберите дату:" />
-    <DatePicker fx:id="datePicker" />
-    <Button fx:id="calculateButton" mnemonicParsing="false" onAction="#onCalculateClick" text="Рассчитать" />
-</HBox>
-<TextArea fx:id="resultTextArea" editable="false" prefHeight="310.0" prefWidth="420.0" style="-fx-font-family: 'Courier New';" VBox.vgrow="ALWAYS" />
+<VBox minHeight="400" minWidth="500.0" prefHeight="400.0" prefWidth="500.0" spacing="15.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.swetophor.astrowidja.fx.MainController">
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+
+    <!-- Строка с датой и кнопкой -->
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label fx:id="datePrompt" prefHeight="20.0" prefWidth="45.0" text="Дата:" />
+        <DatePicker fx:id="datePicker" HBox.hgrow="ALWAYS" />
+        <HBox HBox.hgrow="ALWAYS" />
+        <Button fx:id="calculateButton" onAction="#onCalculateClick" text="Рассчитать" />
+    </HBox>
+
+    <!-- Строка с временем и поясом -->
+    <HBox alignment="CENTER_LEFT" spacing="5.0">
+        <Label fx:id="timePrompt" prefHeight="20.0" prefWidth="50.0" text="Время:" />
+        <Spinner fx:id="hourSetter" prefWidth="70.0" />
+        <Label text=":" />
+        <Spinner fx:id="minuteSetter" prefWidth="70.0" />
+        <ComboBox fx:id="timezoneSelector" maxWidth="250" minHeight="-Infinity" minWidth="180" prefWidth="180" HBox.hgrow="ALWAYS">
+            <HBox.margin>
+                <Insets left="15.0" />
+            </HBox.margin>
+        </ComboBox>
+    </HBox>
+
+    <TextArea fx:id="resultTextArea" editable="false" prefHeight="310.0" prefWidth="470.0" style="-fx-font-family: 'Courier New';" VBox.vgrow="ALWAYS" />
 </VBox>
