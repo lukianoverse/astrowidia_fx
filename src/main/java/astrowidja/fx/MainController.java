@@ -1,5 +1,6 @@
 package astrowidja.fx;
 
+import astrowidja.model.Chart;
 import astrowidja.provider.AstroDataProvider;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,8 +22,6 @@ public class MainController {
 
     private final AppContext appContext = AppContext.getInstance();
     private final AstroDataProvider dataProvider = appContext.getDataProvider();
-    // минимальный набор планет для MVP
-    private final Map<String, Integer> targetPlanets = new LinkedHashMap<>();
 
     @FXML
     private Label datePrompt;
@@ -89,16 +88,6 @@ public class MainController {
         timezoneSelector.getItems().addAll(zones);
         timezoneSelector.setValue(ZoneId.systemDefault().getId());
 
-        // Заполняем карту планет (название и ID по Swiss Ephemeris)
-        targetPlanets.put("Солнце", SE_SUN);
-        targetPlanets.put("Луна", SE_MOON);
-        targetPlanets.put("Меркурий", SE_MERCURY);
-        targetPlanets.put("Венера", SE_VENUS);
-        targetPlanets.put("Марс", SE_MARS);
-        targetPlanets.put("Юпитер", SE_JUPITER);
-        targetPlanets.put("Сатурн", SE_SATURN);
-        targetPlanets.put("Уран", SE_URANUS);
-        targetPlanets.put("Нептун", SE_NEPTUNE);
     }
 
     // On Action кнопки "Рассчитать"
@@ -122,34 +111,20 @@ public class MainController {
         LocalDate utcDate = utcMoment.toLocalDate();
         LocalTime utcTime = utcMoment.toLocalTime();
 
-        StringBuilder output = new StringBuilder();
-        output.append("Местное время:  %s %s (%s)\n".formatted(selectedDate, localTime, zoneIdString));
-        output.append("Расчётный момент: %s %s UTC\n".formatted(utcDate, utcTime));
-        output.append("========================================\n");
+        Chart chart = new Chart(
+                "Карта",
+                utcDate,
+                utcTime,
+                appContext.getAstroRegistry(),
+                dataProvider);
+        appContext.setActiveChart(chart);
 
-        // Проходим по астрам
-        for (Map.Entry<String, Integer> entry : targetPlanets.entrySet()) {
-            String planetName = entry.getKey();
-            int planetId = entry.getValue();
+        String output = "Местное время:  %s %s (%s)\n".formatted(selectedDate, localTime, zoneIdString)
+                + "Расчётный момент: %s %s UTC\n".formatted(utcDate, utcTime)
+                + "========================================\n"
+                + appContext.getActiveChart();
 
-            var result = dataProvider.getPlanetEphemeris(selectedDate, localTime, planetId);
-
-            if (result.isCompleted()) { // Если расчёт выполнен (с замечаниями или без)
-                String retrogradeness = result.isRetrograde() ? " (R)" : "    ";
-                output.append("%-10s%s = %11.5f°\n"
-                        .formatted(planetName, retrogradeness, result.longitude()));
-                // TODO: если status != 0, нужно будет вздымать окошко уведомления
-                if (result.status() > 0 && !result.serr().isEmpty())
-                    output.append("Предупреждение для %s: %s"
-                        .formatted(planetName, result.serr()));
-            } else {
-                output.append("%-10s → Ошибка: %s\n"
-                        .formatted(planetName, result.serr()));
-            }
-        }
-
-        // Выводим собранный текст в окно
-        resultTextArea.setText(output.toString());
+        resultTextArea.setText(output);
     }
 
 }

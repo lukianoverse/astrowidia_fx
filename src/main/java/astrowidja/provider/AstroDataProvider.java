@@ -44,6 +44,7 @@ public class AstroDataProvider {
         int flags = SweConst.SEFLG_SPEED | SweConst.SEFLG_MOSEPH;
 
         int status = swisseph.swe_calc_ut(jdUT, planetId, flags, xp, serr);
+        // TODO: надо будет вздымать окошко с уведомлением, если статус не равен 0
 
         return new SweCalcResult(status, xp, serr.toString());
     }

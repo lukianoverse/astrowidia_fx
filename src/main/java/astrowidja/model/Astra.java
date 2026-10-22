@@ -100,10 +100,10 @@ public class Astra implements ZodiacPoint {
 
     public String getFormattedPosition() {
         int[] coor = CelestialMechanics.degreesToSignAndCoors(getZodiacPosition());
-        return "%s%s%s %2d°%2d'%2d\"".formatted(
+        return "%s%s\t\t%c %2d°%2d'%2d\"".formatted(
                 getSymbol(),
-                isRetrograde() ? "r " : "  ",
-                ZodiacSign.values()[coor[0] - 1],
+                isRetrograde() ? "R " : "  ",
+                ZodiacSign.values()[coor[0] - 1].symbol,
                 coor[1],
                 coor[2],
                 coor[3]);
