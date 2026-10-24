@@ -15,6 +15,8 @@ public class AstroRegistry {
 
     private final List<AstroEntity> registry = new ArrayList<>();
 
+    public static final int NO_SWISS_ID = -1;
+
     /**
      * Возвращает список всех зарегистрированных астросущностей.
      */
@@ -60,36 +62,76 @@ public class AstroRegistry {
         registry.add(entity);
     }
 
+    /**
+     * Проверяет уникальность астросущности в Реестре.
+     * <p>
+     * Метод удостоверяет, что:
+     * <ul>
+     *   <li>внутри сущности нет дубликатов псевдонимов (без учёта регистра);</li>
+     *   <li>имя сущности не совпадает с именем, псевдонимом или символом другой сущности;</li>
+     *   <li>символ сущности не совпадает с символом, именем или псевдонимом другой сущности;</li>
+     *   <li>псевдонимы сущности не совпадают с именами, символами или псевдонимами других сущностей;</li>
+     *   <li>SwissID сущности уникален.</li>
+     * </ul>
+     * При нарушении уникальности выбрасывается {@link IllegalArgumentException}.
+     *
+     * @param entity проверяемая астросущность
+     * @throws IllegalArgumentException если обнаружен дубликат
+     */
     private void validateUniqueness(AstroEntity entity) {
-        // Собираем все имена, символы и псевдонимы, уже занятые другими сущностями
+        // Проверка уникальности псевдонимов внутри одной сущности
+        if (entity.also.size() != entity.also.stream()
+                .map(String::toLowerCase)
+                .distinct()
+                .count()) throw new IllegalArgumentException(
+                "Дубликат псевдонима внутри сущности: " + entity.name);
+
         for (AstroEntity existing : registry) {
-            // Проверка имени
-            if (existing.name.equalsIgnoreCase(entity.name)) {
+            // Проверка имени на совпадение с именем другой сущности
+            if (existing.name.equalsIgnoreCase(entity.name))
                 throw new IllegalArgumentException(
                     "Дубликат имени: " + entity.name);
-            }
-            // Проверка псевдонимов на совпадение с чужим именем
-            for (String alias : entity.also) {
-                if (existing.name.equalsIgnoreCase(alias)) {
+            // Проверка имени на совпадение с чужим псевдонимом
+            for (String alias : existing.also)
+                if (alias.equalsIgnoreCase(entity.name))
                     throw new IllegalArgumentException(
-                        "Псевдоним " + alias + " совпадает с именем " + existing.name);
-                }
-            }
+                            "Имя " + entity.name + " совпадает с псевдонимом " + existing.name);
+            // Проверка имени на совпадение с чужим символом
+            if (existing.symbol != null && existing.symbol.equalsIgnoreCase(entity.name))
+                throw new IllegalArgumentException(
+                        "Имя " + entity.name + " совпадает с символом " + existing.name);
             // Проверка символов
             if (entity.symbol != null && existing.symbol != null
-                    && entity.symbol.equals(existing.symbol)) {
+                    && entity.symbol.equalsIgnoreCase(existing.symbol))
                 throw new IllegalArgumentException(
                     "Дубликат символа: " + entity.symbol);
-            }
-        }
-        // Проверка уникальности псевдонимов внутри одной сущности
-        for (int i = 0; i < entity.also.size(); i++) {
-            for (int j = i + 1; j < entity.also.size(); j++) {
-                if (entity.also.toArray()[i].equals(entity.also.toArray()[j])) {
+            // Проверка символов на совпадение с чужим псевдонимом
+            for (String alias : existing.also)
+                if (entity.symbol != null && entity.symbol.equalsIgnoreCase(alias))
                     throw new IllegalArgumentException(
-                        "Дубликат псевдонима: " + entity.also.toArray()[i]);
-                }
-            }
+                            "Символ " + entity.symbol + " совпадает с псевдонимом " + existing.name);
+            // Проверка псевдонимов на совпадение с чужим именем
+            for (String alias : entity.also)
+                if (alias.equalsIgnoreCase(existing.name))
+                    throw new IllegalArgumentException(
+                        "Псевдоним " + alias + " совпадает с именем " + existing.name);
+            // Проверка псевдонимов на совпадение с чужим символом
+            if (existing.symbol != null)
+                for (String alias : entity.also)
+                    if (alias.equalsIgnoreCase(existing.symbol))
+                        throw new IllegalArgumentException(
+                            "Псевдоним " + alias + " совпадает с символом " + existing.name);
+            // Проверка псевдонимов на совпадение с чужими псевдонимами
+            for (String alias : entity.also)
+                for (String existingAlias : existing.also)
+                    if (alias.equalsIgnoreCase(existingAlias))
+                        throw new IllegalArgumentException(
+                            "Псевдоним " + alias + " совпадает с псевдонимом " + existing.name);
+            // Проверка SwissID
+            if (entity.getSwissId() != NO_SWISS_ID && entity.getSwissId() == existing.getSwissId())
+                throw new IllegalArgumentException(
+                    "Дубликат SwissID: " + entity.getSwissId() +
+                            " (" + entity.name + " и " + existing.name + ")");
         }
     }
 
@@ -116,15 +158,7 @@ public class AstroRegistry {
     };
 
     public AstroRegistry() {
-        initDefaults();
-    }
-
-    /**
-     * Инициализирует базовый набор планет.
-     */
-    private void initDefaults() {
-        for (AstroEntity entity : DEFAULT_ASTRAS) {
+        for (AstroEntity entity : DEFAULT_ASTRAS)
             register(entity);
-        }
     }
 }
