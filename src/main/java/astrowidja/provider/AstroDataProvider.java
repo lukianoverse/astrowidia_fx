@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class AstroDataProvider {
+    // TODO: подумать над архитектурой интерфейса
+    //  (разные провайдеры дают данные по-разному)
 
     private final SwissEph swisseph;
 
@@ -31,7 +33,7 @@ public class AstroDataProvider {
                     "При использовании аналитического расчёта допустима дата"
                             + " от 1350 г. до н.э. до 3000 г. н.э. (получено: " + year + ")");
         }
-        // TODO: поместить эту проверку в контроллер и поставить в зависимость от текущего способа расчёта
+        // TODO: поместить эту проверку в контроллер (?) и поставить в зависимость от текущего способа расчёта
 
         double jdUT = getJdUT(date, timeUtc);
 

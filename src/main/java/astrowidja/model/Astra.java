@@ -7,7 +7,7 @@ public class Astra implements ZodiacPoint {
 
     private String name;
     private Chart heaven;
-    private SweCalcResult ephemeris;
+    private SweCalcResult ephemeris;    // или всё-таки ограничиться лишь долготой и ретроградностью?
     private AstroEntity entity;
 
     @Override

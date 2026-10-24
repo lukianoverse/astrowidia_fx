@@ -11,12 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import javafx.util.StringConverter;
 
-import static swisseph.SweConst.*;
+import javafx.util.StringConverter;
 
 public class MainController {
 
@@ -45,16 +42,25 @@ public class MainController {
     // Инициализация контроллера
     @FXML
     public void initialize() {
-        // По умолчанию текущая дата
+        initDatePicker();
+        initTimeSpinners();
+        initTimezoneSelector();
+    }
+
+    private void initDatePicker() {
         datePicker.setValue(LocalDate.now());
+    }
 
-        // Текущее время системы
+    private void initTimeSpinners() {
         LocalTime now = LocalTime.now();
+        hourSetter.setValueFactory(createTimeSpinnerFactory(23, now.getHour()));
+        minuteSetter.setValueFactory(createTimeSpinnerFactory(59, now.getMinute()));
+    }
 
-        // Часы (0-23), по умолчанию текущие
-        SpinnerValueFactory.IntegerSpinnerValueFactory hoursFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, now.getHour());
-        hoursFactory.setConverter(new StringConverter<>() {
+    private static SpinnerValueFactory.IntegerSpinnerValueFactory createTimeSpinnerFactory(int max, int initial) {
+        SpinnerValueFactory.IntegerSpinnerValueFactory factory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, max, initial);
+        factory.setConverter(new StringConverter<>() {
             @Override
             public String toString(Integer value) {
                 return String.format("%02d", value);
@@ -64,30 +70,15 @@ public class MainController {
                 return Integer.parseInt(string);
             }
         });
-        hourSetter.setValueFactory(hoursFactory);
+        return factory;
+    }
 
-        // Минуты (0-59), по умолчанию текущие
-        SpinnerValueFactory.IntegerSpinnerValueFactory minutesFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, now.getMinute());
-        minutesFactory.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Integer value) {
-                return String.format("%02d", value);
-            }
-            @Override
-            public Integer fromString(String string) {
-                return Integer.parseInt(string);
-            }
-        });
-        minuteSetter.setValueFactory(minutesFactory);
-
-        // Перечень часовых поясов
+    private void initTimezoneSelector() {
         List<String> zones = ZoneId.getAvailableZoneIds().stream()
                 .sorted()
                 .toList();
         timezoneSelector.getItems().addAll(zones);
         timezoneSelector.setValue(ZoneId.systemDefault().getId());
-
     }
 
     // On Action кнопки "Рассчитать"
@@ -115,7 +106,7 @@ public class MainController {
                 "Карта",
                 utcDate,
                 utcTime,
-                appContext.getAstroRegistry(),
+                appContext.getAstroRegistry().getAll(),
                 dataProvider);
         appContext.setActiveChart(chart);
 
