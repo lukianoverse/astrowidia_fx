@@ -1,6 +1,6 @@
 package astrowidja;
 
-import astrowidja.fx.RootContainer;
+import astrowidja.fx.MainFrame;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,11 +13,11 @@ import java.io.IOException;
 public class AWApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(AWApplication.class.getResource("fx/root_window.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(AWApplication.class.getResource("fx/main_frame.fxml"));
         Parent root = fxmlLoader.load();
-        RootContainer rootContainer = fxmlLoader.getController();
+        MainFrame mainFrame = fxmlLoader.getController();
         Scene scene = new Scene(root);
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, rootContainer::handleGlobalKeys);
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, mainFrame::handleGlobalKeys);
         stage.setTitle("АстроВидья");
         stage.setScene(scene);
         stage.setMinWidth(500);

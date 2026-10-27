@@ -15,6 +15,7 @@ import java.util.function.Supplier;
  */
 public class AstroEntity {
 
+    public static final int NO_SWISS_ID = -1;
     /**
      * Основное отображаемое имя астросущности в АстроВидье.
      */
@@ -62,9 +63,92 @@ public class AstroEntity {
 
     /**
      * Возвращает актуальный на момент вызова идентификатор тела для Швейцарских Эфемерид.
+     * Если поставщик выдал {@code null}, возвращает {@code NO_SWISS_ID}.
      */
     public int getSwissId() {
-        return idProvider.get();
+        Integer id = idProvider.get();
+        return id != null ? id : NO_SWISS_ID;
+    }
+
+
+    /**
+     * Добавляет псевдоним с проверкой уникальности внутри сущности.
+     * <p>
+     * Проверяет, что псевдоним не дублирует существующие псевдонимы
+     * этой же сущности (без учёта регистра).
+     *
+     * @param alias псевдоним для добавления
+     * @throws IllegalArgumentException если псевдоним уже существует
+     */
+    public void addAlias(String alias) {
+        if (alias == null || alias.trim().isEmpty())
+            throw new IllegalArgumentException("Псевдоним не может быть пустым");
+
+        if (this.also.stream().anyMatch(a -> a.equalsIgnoreCase(alias)))
+            throw new IllegalArgumentException(
+                "Псевдоним уже существует: " + alias);
+
+        this.also.add(alias);
+    }
+
+    /**
+     * Удаляет псевдоним из сущности.
+     *
+     * @param alias псевдоним для удаления
+     * @return {@code true} если псевдоним был удалён
+     */
+    public boolean removeAlias(String alias) {
+        return this.also.remove(alias);
+    }
+
+    /**
+     * Заменяет один псевдоним на другой.
+     *
+     * @param oldAlias старый псевдоним
+     * @param newAlias новый псевдоним
+     * @throws IllegalArgumentException если старый псевдоним не найден или новый конфликтует
+     */
+    public void setAlias(String oldAlias, String newAlias) {
+        if (!this.also.remove(oldAlias))
+            throw new IllegalArgumentException("Псевдоним не найден: " + oldAlias);
+
+        try {
+            addAlias(newAlias);
+        } catch (IllegalArgumentException e) {
+            this.also.add(oldAlias);
+            throw e;
+        }
+    }
+
+    /**
+     * Проверяет эту сущность на конфликт с другой сущностью.
+     * <p>
+     * Конфликт возникает, если у сущностей есть хотя бы один общий дескриптор
+     * (имя, символ или псевдоним), либо если заданный SwissID совпадает (за
+     * исключением значения NO_SWISS_IS, равного -1).
+     *
+     * @param other проверяемая сущность
+     * @return строка с общими дескрипторами и/или SwissID, разделёнными пробелами;
+     *         пустая строка, если конфликтов нет
+     */
+
+    public String interferes(AstroEntity other) {
+        Set<String> descriptors = gatherDescriptors(this);
+        Set<String> otherDescriptors = gatherDescriptors(other);
+        descriptors.retainAll(otherDescriptors);
+
+        if (getSwissId() != NO_SWISS_ID && getSwissId() == other.getSwissId())
+            descriptors.add("SwissID" + getSwissId());
+
+        return String.join(" ", descriptors);
+    }
+
+    private static Set<String> gatherDescriptors(AstroEntity entity) {
+        Set<String> set = new HashSet<>(entity.also);
+        set.add(entity.name);
+        set.add(entity.symbol);
+        set.remove(null);
+        return set;
     }
 
 }

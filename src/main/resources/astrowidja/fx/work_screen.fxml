@@ -12,7 +12,7 @@
 
 <VBox minHeight="400" minWidth="500.0" prefHeight="400.0" prefWidth="500.0" spacing="15.0"
       xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="astrowidja.fx.MainController">
+      fx:controller="astrowidja.fx.WorkController">
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
     </padding>

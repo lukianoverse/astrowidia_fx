@@ -15,7 +15,7 @@ import java.util.List;
 
 import javafx.util.StringConverter;
 
-public class MainController {
+public class WorkController {
 
     private final AppContext appContext = AppContext.getInstance();
     private final AstroDataProvider dataProvider = appContext.getDataProvider();

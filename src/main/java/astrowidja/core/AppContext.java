@@ -3,8 +3,6 @@ package astrowidja.core;
 import astrowidja.model.Chart;
 import astrowidja.provider.AstroDataProvider;
 
-import static swisseph.SweConst.*;
-
 public class AppContext {
     private static final AppContext instance = new AppContext();
     /**
@@ -35,7 +33,6 @@ public class AppContext {
      * @return сам себя одного и того же.
      */
     public static AppContext getInstance() { return instance; }
-    private boolean isInitialized = false;
 
     public AstroRegistry getAstroRegistry() {
         return astroRegistry;

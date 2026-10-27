@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="astrowidja.fx.MainFrame"
+            prefHeight="400.0" prefWidth="600.0">
+
+<!-- ВЕРХНИЙ РЯД: Тактические кнопки меню а-ля Hearts of Iron -->
+<top>
+    <HBox fx:id="topMenu" prefHeight="40.0" style="-fx-background-color: #1a1a1a;">
+        <Button fx:id="btnWork" text="КАРТА (F5)" onAction="#onMenuButtonClick"
+                HBox.hgrow="ALWAYS"
+                style="-fx-background-radius: 0; -fx-background-color: #2b2b2b; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        <Button fx:id="btnLibrary" text="БИБЛИОТЕКА (F6)" onAction="#onMenuButtonClick"
+                HBox.hgrow="ALWAYS"
+                style="-fx-background-radius: 0; -fx-background-color: #1a1a1a; -fx-text-fill: #888888;"/>
+        <Button fx:id="btnAstras" text="АСТРЫ (F7)" onAction="#onMenuButtonClick"
+                HBox.hgrow="ALWAYS"
+                style="-fx-background-radius: 0; -fx-background-color: #1a1a1a; -fx-text-fill: #888888;"/>
+        <Button fx:id="btnSettings" text="НАСТРОЙКИ (F8)" onAction="#onMenuButtonClick"
+                HBox.hgrow="ALWAYS"
+                style="-fx-background-radius: 0; -fx-background-color: #1a1a1a; -fx-text-fill: #888888;"/>
+    </HBox>
+</top>
+
+<!-- ЦЕНТР: Тот самый блинный StackPane для экранов (в транзиентах меню не участвует) -->
+<center>
+    <StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+               fx:id="mainStackPane" prefHeight="400.0" prefWidth="600.0">
+        <!-- Сюда в рантайме добавятся все 4 экрана -->
+    </StackPane>
+</center>
+
+</BorderPane>
+
+
+
