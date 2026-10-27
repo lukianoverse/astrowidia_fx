@@ -131,7 +131,6 @@ public class AstroEntity {
      * @return строка с общими дескрипторами и/или SwissID, разделёнными пробелами;
      *         пустая строка, если конфликтов нет
      */
-
     public String interferes(AstroEntity other) {
         Set<String> descriptors = gatherDescriptors(this);
         Set<String> otherDescriptors = gatherDescriptors(other);

@@ -1,5 +1,6 @@
 package astrowidja;
 
+import astrowidja.core.AppContext;
 import astrowidja.fx.MainFrame;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -17,11 +18,14 @@ public class AWApplication extends Application {
         Parent root = fxmlLoader.load();
         MainFrame mainFrame = fxmlLoader.getController();
         Scene scene = new Scene(root);
+        // назначаем переключение экранов с клавиатуры
         scene.addEventFilter(KeyEvent.KEY_PRESSED, mainFrame::handleGlobalKeys);
         stage.setTitle("АстроВидья");
         stage.setScene(scene);
         stage.setMinWidth(500);
         stage.setMinHeight(400);
+        // при закрытии сохраняем настройки в ini-файл
+        stage.setOnCloseRequest(event -> AppContext.getInstance().saveSettings());
         stage.show();
     }
 }

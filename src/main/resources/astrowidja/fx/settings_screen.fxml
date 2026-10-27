@@ -1,17 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="astrowidja.fx.SettingsController"
+      spacing="20.0" style="-fx-background-color: #1e1e1e; -fx-text-fill: white;">
 
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
 
-<StackPane xmlns="http://javafx.com/javafx"
-           xmlns:fx="http://javafx.com/fxml"
-           fx:controller="astrowidja.fx.SettingsController" style="-fx-background-color: #1e1e1e;">
-<Label text="ЭКРАН: НАСТРОЙКИ (F8)" style="-fx-text-fill: white; -fx-font-size: 24;"/>
-</StackPane>
+    <Label text="НАСТРОЙКИ РАСЧЁТНОГО ЯДРА" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
 
+    <!-- 1. МЕТОД РАСЧЕТА -->
+    <VBox spacing="5.0">
+        <Label text="Метод расчёта:" style="-fx-text-fill: #888888; -fx-font-weight: bold;"/>
+        <RadioButton fx:id="rbMoshier" text="Moshier (Аналитический, без файлов)" style="-fx-text-fill: white;">
+            <toggleGroup>
+                <ToggleGroup fx:id="calcMethodGroup"/>
+            </toggleGroup>
+        </RadioButton>
+        <RadioButton fx:id="rbSwissEph" text="Swiss Ephemeris (Высокоточный, требуются файлы)"
+                     toggleGroup="$calcMethodGroup" style="-fx-text-fill: white;"/>
+    </VBox>
+
+    <!-- 2. ТИП ЛУННЫХ УЗЛОВ -->
+    <VBox spacing="5.0">
+        <Label text="Лунные Узлы:" style="-fx-text-fill: #888888; -fx-font-weight: bold;"/>
+        <RadioButton fx:id="rbMeanNode" text="Средний Узел (Mean Node)" style="-fx-text-fill: white;">
+            <toggleGroup>
+                <ToggleGroup fx:id="nodeTypeGroup"/>
+            </toggleGroup>
+        </RadioButton>
+        <RadioButton fx:id="rbTrueNode" text="Истинный Узел (True Node, требуются файлы)" toggleGroup="$nodeTypeGroup"
+                     style="-fx-text-fill: white;"/>
+    </VBox>
+
+    <!-- 3. ТИП ЛУННОГО АПОГЕЯ -->
+    <VBox spacing="5.0">
+        <Label text="Лилит:" style="-fx-text-fill: #888888; -fx-font-weight: bold;"/>
+        <RadioButton fx:id="rbMeanLilith" text="Средняя Лилит (Mean)" style="-fx-text-fill: white;">
+            <toggleGroup>
+                <ToggleGroup fx:id="lilithTypeGroup"/>
+            </toggleGroup>
+        </RadioButton>
+        <RadioButton fx:id="rbTrueLilith" text="Истинная / Осциллирующая Лилит (True)" toggleGroup="$lilithTypeGroup"
+                     style="-fx-text-fill: white;"/>
+        <RadioButton fx:id="rbInterpolatedLilith" text="Интерполированная / Натуральная Лилит (Natural)"
+                     toggleGroup="$lilithTypeGroup" style="-fx-text-fill: white;"/>
+    </VBox>
+
+</VBox>

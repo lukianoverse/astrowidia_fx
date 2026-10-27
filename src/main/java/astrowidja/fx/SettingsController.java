@@ -1,10 +1,9 @@
 package astrowidja.fx;
 
-import astrowidja.core.AppContext;
+import astrowidja.core.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +11,7 @@ import java.nio.file.Paths;
 public class SettingsController {
 
     private final AppContext appContext = AppContext.getInstance();
+    private final Settings currentSettings = appContext.getSettings();
 
     @FXML private ToggleGroup calcMethodGroup;
     @FXML private ToggleGroup nodeTypeGroup;
@@ -31,56 +31,86 @@ public class SettingsController {
     public void initialize() {
         boolean ephemerisAvailable = checkEphemerisAvailability();
 
-        if (!ephemerisAvailable) {
-            // Если файлов нет, ограничиваемся Мошьером
+        if (ephemerisAvailable) {
+            // Эфемериды присутствуют! Загружаем сохранённые (или дефолтные) настройки
+            rbMoshier.setSelected(currentSettings.getCalcMethod() == CalcMethod.MOSHIER);
+            rbSwissEph.setSelected(currentSettings.getCalcMethod() == CalcMethod.SWISSEPH);
+
+            rbMeanNode.setSelected(currentSettings.getNodeType() == NodeType.MEAN);
+            rbTrueNode.setSelected(currentSettings.getNodeType() == NodeType.TRUE);
+
+            rbMeanLilith.setSelected(currentSettings.getLilithType() == LilithType.MEAN);
+            rbTrueLilith.setSelected(currentSettings.getLilithType() == LilithType.TRUE);
+            rbInterpolatedLilith.setSelected(currentSettings.getLilithType() == LilithType.INTERPOLATED);
+        } else {
+            // если эфемерид нет:
+            // настройки откатываются на Мошьера
+            currentSettings.setCalcMethod(CalcMethod.MOSHIER);
+            currentSettings.setNodeType(NodeType.MEAN);
+            currentSettings.setLilithType(LilithType.MEAN);
+
+            // выставляем соответствующие опции
             rbMoshier.setSelected(true);
             rbMeanNode.setSelected(true);
             rbMeanLilith.setSelected(true);
 
-            // Блокируем опции, требующие присутствия файлов
+            // отключаем опции, недоступные без эфемерид
             rbSwissEph.setDisable(true);
             rbTrueNode.setDisable(true);
             rbTrueLilith.setDisable(true);
             rbInterpolatedLilith.setDisable(true);
-        } else {
-            // Файлы на месте! Загружаем дефолтные или сохранённые настройки
-            rbSwissEph.setSelected(true);
-            rbTrueNode.setSelected(true);
-            rbMeanLilith.setSelected(true);
         }
 
-        // Тут можно повесить слушатели изменений (Listeners) на ToggleGroup,
-        // чтобы при переключении кнопок обновлять конфиг в AppContext
+        // Вешаем слушатели изменений на группы кнопок,
+        // чтобы их переключение влияло на Настройки
         setupListeners();
     }
 
     private boolean checkEphemerisAvailability() {
-        // Логика проверки путей точно такая же, как в конфигураторе эфемерид
-        String os = System.getProperty("os.name").toLowerCase();
-        Path epheFolder;
+        // 1. Проверяем ресурсы проекта (Classpath) — для отладки прямо в IDE
+        var planetsResource = getClass().getResource("/ephemeris/sepl_18.se1");
+        var moonResource = getClass().getResource("/ephemeris/semo_18.se1");
 
-        if (os.contains("win")) {
-            epheFolder = Paths.get(System.getenv("LOCALAPPDATA"), "AstroWidja", "ephe");
-        } else {
-            epheFolder = Paths.get(System.getProperty("user.home"), ".local", "share", "astrowidja", "ephe");
+        if (planetsResource != null && moonResource != null) {
+            return true;
         }
 
-        // Проверяем физическое существование хотя бы базовых планетарных файлов на диске
-        Path basePlanetsFile = epheFolder.resolve("sepl_18.se1");
-        Path baseMoonFile = epheFolder.resolve("semo_18.se1");
+        // 2. Проверяем локальную папку "ephe" прямо в директории запущенной программы
+        // ( Paths.get(".") смотрит в корень, где лежит JAR или запускается процесс )
+        Path localEpheFolder = Paths.get(".").resolve("ephe");
+
+        Path basePlanetsFile = localEpheFolder.resolve("sepl_18.se1");
+        Path baseMoonFile = localEpheFolder.resolve("semo_18.se1");
 
         return Files.exists(basePlanetsFile) && Files.exists(baseMoonFile);
     }
 
+
+    // Чтобы при выборе опции значение тут же актуализировалось
     private void setupListeners() {
-        calcMethodGroup.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            if (newToggle == rbMoshier) {
-                // Записать в AppContext глобальный флаг использования Moshier
-            } else if (newToggle == rbSwissEph) {
-                // Записать флаг использования SwissEph
-            }
+
+        calcMethodGroup.selectedToggleProperty().addListener((obs, oldT, newT) -> {
+            if (newT == rbMoshier)
+                currentSettings.setCalcMethod(CalcMethod.MOSHIER);
+            if (newT == rbSwissEph)
+                currentSettings.setCalcMethod(CalcMethod.SWISSEPH);
         });
 
-        // Аналогичные слушатели для nodeTypeGroup и lilithTypeGroup...
+        nodeTypeGroup.selectedToggleProperty().addListener((obs, oldT, newT) -> {
+            if (newT == rbMeanNode)
+                currentSettings.setNodeType(NodeType.MEAN);
+            if (newT == rbTrueNode)
+                currentSettings.setNodeType(NodeType.TRUE);
+        });
+
+        lilithTypeGroup.selectedToggleProperty().addListener((obs, oldT, newT) -> {
+            if (newT == rbMeanLilith)
+                currentSettings.setLilithType(LilithType.MEAN);
+            if (newT == rbTrueLilith)
+                currentSettings.setLilithType(LilithType.TRUE);
+            if (newT == rbInterpolatedLilith)
+                currentSettings.setLilithType(LilithType.INTERPOLATED);
+        });
     }
+
 }

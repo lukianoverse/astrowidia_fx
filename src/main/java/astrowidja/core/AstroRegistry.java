@@ -52,7 +52,6 @@ public class AstroRegistry {
             for (String alias : entity.also)
                 if (alias.equalsIgnoreCase(name))
                     return Optional.of(entity);
-
         }
         return Optional.empty();
     }
@@ -92,12 +91,10 @@ public class AstroRegistry {
     /**
      * Проверяет уникальность астросущности в Реестре.
      * <p>
-     * Метод удостоверяет, что:
-     * <ul>
-     *   <li>внутри сущности нет дубликатов псевдонимов (без учёта регистра);</li>
-     *   <li>сущность не конфликтует с другими сущностями (имена, символы, псевдонимы, SwissID).</li>
-     * </ul>
-     * При нарушении уникальности выбрасывается {@link IllegalArgumentException}.
+     * Метод удостоверяет, что сущность не конфликтует с другими сущностями
+     * (имена, символы, псевдонимы, SwissID).
+     * При нарушении уникальности выбрасывается {@link IllegalArgumentException}
+     * с перечислением найденных интерференций.
      *
      * @param entity проверяемая астросущность
      * @throws IllegalArgumentException если обнаружен дубликат
