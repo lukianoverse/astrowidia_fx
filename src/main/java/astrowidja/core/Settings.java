@@ -1,5 +1,8 @@
 package astrowidja.core;
 
+import astrowidja.provider.CalcMethod;
+import astrowidja.provider.LilithType;
+import astrowidja.provider.NodeType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 

@@ -1,6 +1,8 @@
 package astrowidja.core;
 
 import astrowidja.model.AstroEntity;
+import astrowidja.provider.LilithType;
+import astrowidja.provider.NodeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,15 +125,33 @@ public class AstroRegistry {
 //        new AstroEntity("Хирон", "⚷", SE_AST_OFFSET + 2060, "Chiron"),
         new AstroEntity("Уран", "♅", SE_URANUS, "Uranus"),
         new AstroEntity("Нептун", "♆", SE_NEPTUNE, "Neptune"),
-//        new AstroEntity("Плутон", "⯓", SE_PLUTO, "Pluto"),
-//        new AstroEntity("Раху", "☊",
-//                () -> useTrueNode ? SE_TRUE_NODE : SE_MEAN_NODE, "Rahu", "North Node"),
-//        new AstroEntity("Лилит", "⚸",
-//                () -> useTrueLilith ? SE_OSCU_APOGEE : SE_MEAN_APOGEE, "Lilith", "Black Moon")
+//        new AstroEntity("Плутон", "⯓", SE_PLUTO, "Pluto")
     };
+
+    private static final AstroEntity[] FIC_ASTRAS = {
+        // УЗЛЫ: Динамически выбирает ID в зависимости от рантайм-настроек в AppContext
+        new AstroEntity("Раху", "☊", () -> {
+            NodeType type = AppContext.getInstance().getSettings().getNodeType();
+            return (type == NodeType.TRUE) ? SE_TRUE_NODE : SE_MEAN_NODE; },
+                "Rahu", "Северный Узел", "Голова Дракона", "North Node"),
+
+        // ЛИЛИТ: Динамически выбирает ID из трех вариантов
+        new AstroEntity("Лилит", "⚸", () -> {
+            LilithType type = AppContext.getInstance().getSettings().getLilithType();
+            return type == LilithType.TRUE ? SE_OSCU_APOG :
+                    type == LilithType.INTERPOLATED ? SE_INTP_APOG :
+                            SE_MEAN_APOG; },
+                "Lilith", "Black Moon")
+    };
+
 
     public AstroRegistry() {
         for (AstroEntity entity : DEFAULT_ASTRAS)
+            register(entity);
+    }
+
+    public void init() {
+        for (AstroEntity entity : FIC_ASTRAS)
             register(entity);
     }
 }

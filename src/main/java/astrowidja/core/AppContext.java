@@ -2,6 +2,9 @@ package astrowidja.core;
 
 import astrowidja.model.Chart;
 import astrowidja.provider.AstroDataProvider;
+import astrowidja.provider.CalcMethod;
+import astrowidja.provider.LilithType;
+import astrowidja.provider.NodeType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class AppContext {
-    private static final AppContext instance = new AppContext();
+    private static AppContext instance;
     /**
      * Поставщик данных о положениях небесных тел.
      */
@@ -51,7 +54,9 @@ public class AppContext {
         if (!Files.exists(awdataFolder)) {
             try {
                 Files.createDirectories(awdataFolder);
-                System.out.println("Создана локальная папка библиотек: " + awdataFolder.toAbsolutePath());
+                // TODO: это всё в лог, как цивилизованные люди
+                System.out.println("Создана локальная папка библиотек: "
+                        + awdataFolder.toAbsolutePath().normalize());
             } catch (IOException e) {
                 System.err.println("Не удалось создать папку awdata: " + e.getMessage());
             }
@@ -111,9 +116,17 @@ public class AppContext {
      * Синглетон для удержания глобальных компонентов.
      * @return сам себя одного и того же.
      */
-    public static AppContext getInstance() {
+//    public static AppContext getInstance() {
+//        return instance;
+//    }
+    public static synchronized AppContext getInstance() {
+        if (instance == null) {
+            instance = new AppContext();
+            instance.astroRegistry.init();
+        }
         return instance;
     }
+
 
     public AstroRegistry getAstroRegistry() {
         return astroRegistry;

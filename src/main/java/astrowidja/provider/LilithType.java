@@ -1,4 +1,4 @@
-package astrowidja.core;
+package astrowidja.provider;
 
 public enum LilithType {
     MEAN, TRUE, INTERPOLATED

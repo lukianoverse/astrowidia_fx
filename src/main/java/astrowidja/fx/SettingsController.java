@@ -1,9 +1,14 @@
 package astrowidja.fx;
 
-import astrowidja.core.*;
+import astrowidja.core.AppContext;
+import astrowidja.core.Settings;
+import astrowidja.provider.CalcMethod;
+import astrowidja.provider.LilithType;
+import astrowidja.provider.NodeType;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -75,8 +80,8 @@ public class SettingsController {
             return true;
         }
 
-        // 2. Проверяем локальную папку "ephe" прямо в директории запущенной программы
-        // ( Paths.get(".") смотрит в корень, где лежит JAR или запускается процесс )
+        // 2. Проверяем локальную папку "ephe" в директории запущенной программы
+        // (Paths.get(".") смотрит в корень, где лежит JAR или запускается процесс)
         Path localEpheFolder = Paths.get(".").resolve("ephe");
 
         Path basePlanetsFile = localEpheFolder.resolve("sepl_18.se1");
