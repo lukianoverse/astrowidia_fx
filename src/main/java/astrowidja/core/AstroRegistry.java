@@ -1,10 +1,11 @@
 package astrowidja.core;
 
 import astrowidja.model.AstroEntity;
-import astrowidja.provider.LilithType;
-import astrowidja.provider.NodeType;
+import astrowidja.model.LilithType;
+import astrowidja.model.NodeType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,24 +46,18 @@ public class AstroRegistry {
      */
     public Optional<AstroEntity> findByName(String name) {
         if (name == null) return Optional.empty();
-        name = name.trim();
-        for (AstroEntity entity : registry) {
-            if (entity.name.equalsIgnoreCase(name))
-                return Optional.of(entity);
-            if (entity.symbol.equals(name))
-                return Optional.of(entity);
-            for (String alias : entity.also)
-                if (alias.equalsIgnoreCase(name))
-                    return Optional.of(entity);
-        }
-        return Optional.empty();
+        return registry.stream()
+                .filter(entity -> entity.matches(name.trim()))
+                .findFirst();
     }
 
     /**
      * Возвращает символ сущности по имени, или "*" если не найдена.
      */
     public String findSymbolFor(String name) {
-        return findByName(name).map(entity -> entity.symbol).orElse("*");
+        return findByName(name)
+                .map(AstroEntity::getSymbol)
+                .orElse("*");
     }
 
     /**
@@ -106,52 +101,95 @@ public class AstroRegistry {
             String conflict = entity.interferes(existing);
             if (!conflict.isBlank()) throw new IllegalArgumentException(
                     "Конфликт определения сущности \"%s\" с сущностью \"%s\":\n%s"
-                            .formatted(entity.name, existing.name, conflict));
+                            .formatted(entity.getName(), existing.getName(), conflict));
         }
     }
 
     /**
-     * Базовый набор планет для инициализации реестра.
+     * Основные планеты (без эфемеридных файлов — расчёт по Мошьеру).
      */
-    private static final AstroEntity[] DEFAULT_ASTRAS = {
+    private static final AstroEntity[] PLANETS = {
         new AstroEntity("Солнце", "☉", SE_SUN, "Sun", "Sol", "Сурья", "Рави"),
         new AstroEntity("Луна", "☽", SE_MOON, "Moon", "Чандра"),
         new AstroEntity("Меркурий", "☿", SE_MERCURY, "Mercury", "Буддха"),
         new AstroEntity("Венера", "♀", SE_VENUS, "Venus", "Шукра"),
         new AstroEntity("Марс", "♂", SE_MARS, "Mars", "Мангала"),
-//        new AstroEntity("Церера", "⚳", SE_AST_OFFSET + 1, "Ceres"),
         new AstroEntity("Юпитер", "♃", SE_JUPITER, "Jupiter", "Гуру", "Брихаспати"),
         new AstroEntity("Сатурн", "♄", SE_SATURN, "Saturn", "Шани"),
-//        new AstroEntity("Хирон", "⚷", SE_AST_OFFSET + 2060, "Chiron"),
         new AstroEntity("Уран", "♅", SE_URANUS, "Uranus"),
         new AstroEntity("Нептун", "♆", SE_NEPTUNE, "Neptune"),
-//        new AstroEntity("Плутон", "⯓", SE_PLUTO, "Pluto")
+        new AstroEntity("Плутон", "⯓", SE_PLUTO, "Pluto")
     };
 
-    private static final AstroEntity[] FIC_ASTRAS = {
-        // УЗЛЫ: Динамически выбирает ID в зависимости от рантайм-настроек в AppContext
+    /**
+     * Лунные точки: узлы и аспиды (Лилит).
+     * SwissID разрешается динамически на основе настроек AppContext.
+     */
+    private static final AstroEntity[] LUNAR_POINTS = {
         new AstroEntity("Раху", "☊", () -> {
-            NodeType type = AppContext.getInstance().getSettings().getNodeType();
-            return (type == NodeType.TRUE) ? SE_TRUE_NODE : SE_MEAN_NODE; },
-                "Rahu", "Северный Узел", "Голова Дракона", "North Node"),
-
-        // ЛИЛИТ: Динамически выбирает ID из трех вариантов
+            NodeType type = AppContext.getInstance().getCurrentSettings().getNodeType();
+            return (type == NodeType.TRUE) ? SE_TRUE_NODE : SE_MEAN_NODE;
+        }, "Rahu", "Северный Узел", "Голова Дракона", "North Node"),
         new AstroEntity("Лилит", "⚸", () -> {
-            LilithType type = AppContext.getInstance().getSettings().getLilithType();
+            LilithType type = AppContext.getInstance().getCurrentSettings().getLilithType();
             return type == LilithType.TRUE ? SE_OSCU_APOG :
-                    type == LilithType.INTERPOLATED ? SE_INTP_APOG :
-                            SE_MEAN_APOG; },
-                "Lilith", "Black Moon")
+                    type == LilithType.INTERPOLATED ? SE_INTP_APOG : SE_MEAN_APOG;
+        }, "Lilith", "Чёрная Луна", "Black Moon")
     };
 
+    /**
+     * Кентавры: малые тела с орбитами между Юпитером и Нептуном.
+     */
+    private static final AstroEntity[] CENTAURS = {
+        new AstroEntity("Хирон", "⚷", SE_AST_OFFSET + 2060, "Chiron"),
+        // TODO: добавить Фол, Асбол, Несс и др.
+    };
 
-    public AstroRegistry() {
-        for (AstroEntity entity : DEFAULT_ASTRAS)
-            register(entity);
+    /**
+     * Астероиды: основные астероиды 1-й группы.
+     */
+    private static final AstroEntity[] ASTEROIDS = {
+        new AstroEntity("Церера", "⚳", SE_AST_OFFSET + 1, "Ceres"),
+        // TODO: добавить Палладу, Юнону, Весту и др.
+    };
+
+    /**
+     * Пользовательские сущности — добавляются/удаляются в runtime.
+     * Состояние сохраняется в файл и загружается при старте.
+     */
+    private final List<AstroEntity> userDefinedAstras = new ArrayList<>();
+
+    /**
+     * Загрузка пользовательских сущностей из хранилища.
+     */
+    public void loadUserDefinedAstras() {
+        // TODO: загрузить из файла/хранилища и populate userDefinedAstras
     }
 
+    /**
+     * Сохранение пользовательских сущностей в хранилище.
+     */
+    public void saveUserDefinedAstras() {
+        // TODO: сохранить userDefinedAstras в файл
+    }
+
+    /**
+     * Регистрация пользовательской сущности.
+     */
+    public void registerUserDefined(AstroEntity entity) {
+        userDefinedAstras.add(entity);
+        register(entity);
+    }
+
+    /**
+     * Инициализация реестра: поочерёдная регистрация всех категорий.
+     */
     public void init() {
-        for (AstroEntity entity : FIC_ASTRAS)
-            register(entity);
+        loadUserDefinedAstras();
+        Arrays.stream(PLANETS).forEach(this::register);
+        Arrays.stream(LUNAR_POINTS).forEach(this::register);
+        Arrays.stream(CENTAURS).forEach(this::register);
+        Arrays.stream(ASTEROIDS).forEach(this::register);
+        userDefinedAstras.forEach(this::register);
     }
 }

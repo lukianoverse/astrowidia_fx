@@ -28,11 +28,11 @@ public class Astra implements ZodiacPoint {
     }
 
     public String getSymbol() {
-        return entity.symbol;
+        return entity.getSymbol();
     }
 
     public Astra(AstroEntity entity, Chart heaven, SweCalcResult ephemeris) {
-        name = entity.name;
+        name = entity.getName();
         this.heaven = heaven;
         this.ephemeris = ephemeris;
         this.entity = entity;

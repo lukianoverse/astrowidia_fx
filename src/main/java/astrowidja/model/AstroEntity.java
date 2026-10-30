@@ -1,6 +1,11 @@
 package astrowidja.model;
 
-import java.util.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -19,20 +24,24 @@ public class AstroEntity {
     /**
      * Основное отображаемое имя астросущности в АстроВидье.
      */
-    public final String name;
+    private final String name;
 
     /**
      * Строковый астрологический символ (глиф) для отображения.
      * Использование String вместо char введено для поддержки современных
      * суррогатных пар Юникода (глифы Плутона '⯓' или Седны '🝼').
      */
-    public final String symbol;
+    private final String symbol;
 
     /**
      * Набор альтернативных названий и псевдонимов сущности.
      * Открыт к изменениям в процессе работы программы.
      */
-    public final Set<String> also;
+    private final Set<String> also;
+
+    public Set<String> getAlso() {
+        return also;
+    }
 
     /**
      * Динамический поставщик идентификатора для Swiss Ephemeris.
@@ -41,17 +50,37 @@ public class AstroEntity {
      */
     private final Supplier<Integer> idProvider;
 
+
+//    private final BooleanProperty calculated = new SimpleBooleanProperty(false);
+//
+//
+//    public BooleanProperty calculatedProperty() {
+//        return calculated;
+//    }
+//
+//    public boolean isCalculated() {
+//        return calculated.get();
+//    }
+//
+//    public void setCalculated(boolean calculated) {
+//        this.calculated.set(calculated);
+//    }
+
     /**
      * Полный конструктор для создания астросущности с динамическим поставщиком ID.
      * Автоматически регистрирует созданный объект в глобальном реестре системы.
      */
-    public AstroEntity(String name, String symbol, Supplier<Integer> idProvider, String... also) {
+    public AstroEntity(String name,
+                       String symbol,
+                       Supplier<Integer> idProvider,
+                       String... also) {
         this.name = name;
         this.symbol = symbol;
         this.idProvider = idProvider;
         this.also = new HashSet<>();
         Collections.addAll(this.also, also);
     }
+    //TODO: наверное, имя может содержать пробел, но не запятую
 
     /**
      * Удобный облегчённый конструктор для обычных планет. В качестве ID
@@ -142,6 +171,12 @@ public class AstroEntity {
         return String.join(" ", descriptors);
     }
 
+    public boolean matches(String identifier) {
+        return getName().equalsIgnoreCase(identifier)
+                || getSymbol().equals(identifier)
+                || getAlso().stream().anyMatch(alias -> alias.equalsIgnoreCase(identifier));
+    }
+
     private static Set<String> gatherDescriptors(AstroEntity entity) {
         Set<String> set = new HashSet<>(entity.also);
         set.add(entity.name);
@@ -149,5 +184,16 @@ public class AstroEntity {
         set.remove(null);
         return set;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+
+
 
 }

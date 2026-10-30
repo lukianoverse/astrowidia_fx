@@ -3,8 +3,8 @@ package astrowidja.core;
 import astrowidja.model.Chart;
 import astrowidja.provider.AstroDataProvider;
 import astrowidja.provider.CalcMethod;
-import astrowidja.provider.LilithType;
-import astrowidja.provider.NodeType;
+import astrowidja.model.LilithType;
+import astrowidja.model.NodeType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +27,7 @@ public class AppContext {
     // TODO: акромя общего реестра астросущностей, нужна механика
     //  управления списками пользователя
 
-    private final Settings settings = new Settings();
+    private final Settings currentSettings = new Settings();
     private Path settingsFilePath;
     /**
      * Карта, активная в данный момент. То есть отображаемая и доступная для расчётов.
@@ -74,11 +74,20 @@ public class AppContext {
 
             // Читаем значения из файла, если строки кривые — сработает дефолт
             if (props.containsKey("calcMethod"))
-                settings.setCalcMethod(CalcMethod.valueOf(props.getProperty("calcMethod")));
+                currentSettings.setCalcMethod(CalcMethod.valueOf(props.getProperty("calcMethod")));
             if (props.containsKey("nodeType"))
-                settings.setNodeType(NodeType.valueOf(props.getProperty("nodeType")));
+                currentSettings.setNodeType(NodeType.valueOf(props.getProperty("nodeType")));
             if (props.containsKey("lilithType"))
-                settings.setLilithType(LilithType.valueOf(props.getProperty("lilithType")));
+                currentSettings.setLilithType(LilithType.valueOf(props.getProperty("lilithType")));
+            if (props.containsKey("activeAstras")) {
+                String[] names = props.getProperty("activeAstras").split(",");
+                currentSettings.getAstrasToCalculate().setAll(names);
+            } else {
+                // Выбранные по умолчанию астры
+                currentSettings.getAstrasToCalculate()
+                        .setAll("Солнце", "Луна", "Меркурий", "Венера", "Марс",
+                                "Юпитер", "Сатурн", "Уран", "Нептун");
+            }
         } catch (Exception e) {
             // TODO: заменить на уведомление
             System.err.println("Ошибка чтения настроек, используются дефолты: " + e.getMessage());
@@ -90,9 +99,11 @@ public class AppContext {
             Files.createDirectories(settingsFilePath.getParent());
             try (OutputStream os = Files.newOutputStream(settingsFilePath)) {
                 Properties props = new Properties();
-                props.setProperty("calcMethod", settings.getCalcMethod().name());
-                props.setProperty("nodeType", settings.getNodeType().name());
-                props.setProperty("lilithType", settings.getLilithType().name());
+                props.setProperty("calcMethod", currentSettings.getCalcMethod().name());
+                props.setProperty("nodeType", currentSettings.getNodeType().name());
+                props.setProperty("lilithType", currentSettings.getLilithType().name());
+                String activeAstrasLine = String.join(",", currentSettings.getAstrasToCalculate());
+                props.setProperty("activeAstras", activeAstrasLine);
 
                 props.store(os, "AstroWidja Settings");
                 System.out.println("Настройки успешно сохранены в " + settingsFilePath);
@@ -113,18 +124,24 @@ public class AppContext {
     }
 
     /**
-     * Синглетон для удержания глобальных компонентов.
-     * @return сам себя одного и того же.
+     * Возвращает синглтон-экземпляр {@code AppContext}.
+     * <p>
+     * Экземпляр создаётся лениво: при первом обращении он инициализируется
+     * в два этапа: сначала конструктор создаёт настройки, затем метод {@code postConstruct()}
+     * иициализирует астры на основе настроек. Метод на всякий случай синхронизирован.
+     *
+     * @return глобальный экземпляр {@code AppContext}
      */
-//    public static AppContext getInstance() {
-//        return instance;
-//    }
     public static synchronized AppContext getInstance() {
         if (instance == null) {
             instance = new AppContext();
-            instance.astroRegistry.init();
+            postConstruct();
         }
         return instance;
+    }
+
+    private static void postConstruct() {
+        instance.astroRegistry.init();
     }
 
 
@@ -136,8 +153,8 @@ public class AppContext {
         return dataProvider;
     }
 
-    public Settings getSettings() {
-        return settings;
+    public Settings getCurrentSettings() {
+        return currentSettings;
     }
 
 

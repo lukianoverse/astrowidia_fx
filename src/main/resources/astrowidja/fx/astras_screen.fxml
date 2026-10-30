@@ -1,16 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="astrowidja.fx.AstrasController"
+      spacing="20.0" style="-fx-background-color: #212121;">
 
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
 
-<StackPane xmlns="http://javafx.com/javafx"
-           xmlns:fx="http://javafx.com/fxml"
-           fx:controller="astrowidja.fx.AstrasController" style="-fx-background-color: #212121;">
-<Label text="ЭКРАН: РЕЕСТРЫ АСТР (F7)" style="-fx-text-fill: white; -fx-font-size: 24;"/>
-</StackPane>
+    <Label text="РЕЕСТР АСТРОЛОГИЧЕСКИХ ОБЪЕКТОВ"
+           style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <!-- Главная двухколоночная сетка -->
+    <GridPane hgap="40.0" VBox.vgrow="ALWAYS">
+        <columnConstraints>
+            <!-- Левая колонка под 12 тел (чуть шире) -->
+            <ColumnConstraints percentWidth="60.0"/>
+            <!-- Правая колонка под Раху/Лилит -->
+            <ColumnConstraints percentWidth="40.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints vgrow="ALWAYS"/>
+        </rowConstraints>
+
+        <!-- ЛЕВАЯ ГРУППА: Основные тела -->
+        <VBox fx:id="mainAstrasGroup" spacing="10.0" GridPane.columnIndex="0"
+              style="-fx-border-color: #333333; -fx-border-width: 0 1 0 0; -fx-padding: 0 20 0 0;">
+            <Label text="ОСНОВНЫЕ ТЕЛА"
+                   style="-fx-text-fill: #888888; -fx-font-size: 13; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+            <!-- Сюда программно добавятся первые 12 чекбоксов -->
+        </VBox>
+
+        <!-- ПРАВАЯ ГРУППА: Раху и Лилит -->
+        <VBox fx:id="lunarAstrasGroup" spacing="10.0" GridPane.columnIndex="1">
+            <Label text="ЛУННЫЕ ФАКТОРЫ"
+                   style="-fx-text-fill: #888888; -fx-font-size: 13; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+            <!-- Сюда программно добавятся Раху и Лилит -->
+        </VBox>
+    </GridPane>
+</VBox>

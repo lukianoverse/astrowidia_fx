@@ -3,8 +3,8 @@ package astrowidja.fx;
 import astrowidja.core.AppContext;
 import astrowidja.core.Settings;
 import astrowidja.provider.CalcMethod;
-import astrowidja.provider.LilithType;
-import astrowidja.provider.NodeType;
+import astrowidja.model.LilithType;
+import astrowidja.model.NodeType;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 public class SettingsController {
 
     private final AppContext appContext = AppContext.getInstance();
-    private final Settings currentSettings = appContext.getSettings();
+    private final Settings currentSettings = appContext.getCurrentSettings();
 
     @FXML private ToggleGroup calcMethodGroup;
     @FXML private ToggleGroup nodeTypeGroup;
