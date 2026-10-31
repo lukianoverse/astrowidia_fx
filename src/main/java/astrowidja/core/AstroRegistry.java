@@ -201,4 +201,16 @@ public class AstroRegistry {
         loadUserDefinedAstras();
         userDefinedAstras.forEach(this::register);
     }
+
+    public AstroEntity[] getDefaultBodies() {
+        return MAIN_ASTRAS;
+    }
+
+    public AstroEntity[] getLunarPoints() {
+        return LUNAR_POINTS;
+    }
+
+    public List<AstroEntity> getUserDefinedAstras() {
+        return userDefinedAstras;
+    }
 }

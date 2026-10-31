@@ -1,46 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="astrowidja.fx.AstrasController"
-      spacing="20.0" style="-fx-background-color: #212121;">
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="astrowidja.fx.AstrasController"
+            fitToHeight="true" vbarPolicy="NEVER"
+            style="-fx-background-color: #212121; -fx-background: #212121;">
 
-    <padding>
-        <Insets top="25" right="25" bottom="25" left="25"/>
-    </padding>
+    <!-- Горизонтальный контейнер для всех колонок. Сюда всё будет расти вправо -->
+    <HBox fx:id="columnsContainer" spacing="20.0" style="-fx-background-color: #212121;">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
 
-    <Label text="РЕЕСТР АСТРОЛОГИЧЕСКИХ ОБЪЕКТОВ"
-           style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
-
-    <!-- Главная двухколоночная сетка -->
-    <GridPane hgap="40.0" VBox.vgrow="ALWAYS">
-        <columnConstraints>
-            <!-- Левая колонка под 12 тел (чуть шире) -->
-            <ColumnConstraints percentWidth="60.0"/>
-            <!-- Правая колонка под Раху/Лилит -->
-            <ColumnConstraints percentWidth="40.0"/>
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints vgrow="ALWAYS"/>
-        </rowConstraints>
-
-        <!-- ЛЕВАЯ ГРУППА: Основные тела -->
-        <VBox fx:id="mainAstrasGroup" spacing="10.0" GridPane.columnIndex="0"
-              style="-fx-border-color: #333333; -fx-border-width: 0 1 0 0; -fx-padding: 0 20 0 0;">
-            <Label text="ОСНОВНЫЕ ТЕЛА"
-                   style="-fx-text-fill: #888888; -fx-font-size: 13; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
-            <!-- Сюда программно добавятся первые 12 чекбоксов -->
+        <!-- КОЛОНКА 1: Фиксированная (300px) под Основные 12 тел -->
+        <VBox prefWidth="300.0" minWidth="300.0" maxWidth="300.0" spacing="10.0">
+            <TitledPane text="ОСНОВНЫЕ ТЕЛА" collapsible="false" maxHeight="Infinity"
+                        VBox.vgrow="ALWAYS"
+                        style="-fx-base: #2b2b2b; -fx-text-fill: #888888; -fx-font-weight: bold;">
+                <VBox fx:id="mainAstrasGroup" spacing="12.0" style="-fx-background-color: #2b2b2b;"/>
+            </TitledPane>
         </VBox>
 
-        <!-- ПРАВАЯ ГРУППА: Раху и Лилит -->
-        <VBox fx:id="lunarAstrasGroup" spacing="10.0" GridPane.columnIndex="1">
-            <Label text="ЛУННЫЕ ФАКТОРЫ"
-                   style="-fx-text-fill: #888888; -fx-font-size: 13; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
-            <!-- Сюда программно добавятся Раху и Лилит -->
+        <!-- КОЛОНКА 2: Фиксированная (300px) под Лунные факторы + Первый пакет расширения -->
+        <VBox prefWidth="300.0" minWidth="300.0" maxWidth="300.0" spacing="15.0">
+
+            <!-- Блок: Лунные точки -->
+            <TitledPane text="ЛУННЫЕ ФАКТОРЫ" collapsible="false">
+                <VBox fx:id="lunarAstrasGroup" spacing="10.0" style="-fx-background-color: #2b2b2b;"/>
+            </TitledPane>
+
+            <!-- Блок: Первый пакет расширения (Астероиды) -->
+            <TitledPane text="РАСШИРЕННЫЕ АСТЕРОИДЫ" collapsible="false" maxHeight="Infinity"
+                        VBox.vgrow="ALWAYS">
+                <VBox fx:id="extraAsteroidsGroup" spacing="12.0" style="-fx-background-color: #2b2b2b;">
+                    <!-- Сюда пойдут Эрида, Седна, Психея и др. -->
+                </VBox>
+            </TitledPane>
         </VBox>
-    </GridPane>
-</VBox>
+
+        <!-- КОЛОНКИ ПОЛЬЗОВАТЕЛЯ БУДУТ ГЕНЕРИРОВАТЬСЯ ЗДЕСЬ ИЗ КОДА (вправо) -->
+
+    </HBox>
+</ScrollPane>

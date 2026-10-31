@@ -22,8 +22,11 @@ public class AWApplication extends Application {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, mainFrame::handleGlobalKeys);
         stage.setTitle("АстроВидья");
         stage.setScene(scene);
-        stage.setMinWidth(500);
-        stage.setMinHeight(400);
+        stage.setMinWidth(850);
+        stage.setMinHeight(600);
+        // на весь экран (пока не включаем)
+//        stage.setMaximized(true);
+
         // при закрытии сохраняем настройки в ini-файл
         stage.setOnCloseRequest(event -> AppContext.getInstance().saveSettings());
         stage.show();
