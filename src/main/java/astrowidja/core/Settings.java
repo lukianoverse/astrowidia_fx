@@ -16,6 +16,7 @@ public class Settings {
 
     // астры, идущие в расчёт
     private final ObservableList<String> astrasToCalculate = FXCollections.observableArrayList();
+
     public ObservableList<String> getAstrasToCalculate() {
         return astrasToCalculate;
     }

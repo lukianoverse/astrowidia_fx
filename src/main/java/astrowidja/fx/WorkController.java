@@ -1,5 +1,7 @@
 package astrowidja.fx;
 
+import astrowidja.core.AstroRegistry;
+import astrowidja.core.Settings;
 import astrowidja.model.Chart;
 import astrowidja.provider.AstroDataProvider;
 import javafx.event.ActionEvent;
@@ -19,6 +21,8 @@ public class WorkController {
 
     private final AppContext appContext = AppContext.getInstance();
     private final AstroDataProvider dataProvider = appContext.getDataProvider();
+    private final Settings currentSettings = appContext.getCurrentSettings();
+    private final AstroRegistry registry = appContext.getAstroRegistry();
 
     @FXML
     private Label datePrompt;
@@ -106,7 +110,7 @@ public class WorkController {
                 "Карта",
                 utcDate,
                 utcTime,
-                appContext.getAstroRegistry().getAll(),
+                registry.getEntitiesToCalculate(currentSettings.getAstrasToCalculate()),
                 dataProvider);
         appContext.setActiveChart(chart);
 

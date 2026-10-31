@@ -3,6 +3,7 @@ package astrowidja.core;
 import astrowidja.model.AstroEntity;
 import astrowidja.model.LilithType;
 import astrowidja.model.NodeType;
+import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,14 @@ public class AstroRegistry {
             SE_MEAN_NODE,
             SE_MEAN_APOG
     };
+
+    public List<AstroEntity> getEntitiesToCalculate(ObservableList<String> astrasToCalculate) {
+        return astrasToCalculate.stream()
+                .map(this::findByName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
 
     /**
      * Возвращает список всех зарегистрированных астросущностей.
@@ -108,14 +117,16 @@ public class AstroRegistry {
     /**
      * Основные планеты (без эфемеридных файлов — расчёт по Мошьеру).
      */
-    private static final AstroEntity[] PLANETS = {
+    private static final AstroEntity[] MAIN_ASTRAS = {
         new AstroEntity("Солнце", "☉", SE_SUN, "Sun", "Sol", "Сурья", "Рави"),
         new AstroEntity("Луна", "☽", SE_MOON, "Moon", "Чандра"),
         new AstroEntity("Меркурий", "☿", SE_MERCURY, "Mercury", "Буддха"),
         new AstroEntity("Венера", "♀", SE_VENUS, "Venus", "Шукра"),
         new AstroEntity("Марс", "♂", SE_MARS, "Mars", "Мангала"),
+        new AstroEntity("Церера", "⚳", SE_AST_OFFSET + 1, "Ceres"),
         new AstroEntity("Юпитер", "♃", SE_JUPITER, "Jupiter", "Гуру", "Брихаспати"),
         new AstroEntity("Сатурн", "♄", SE_SATURN, "Saturn", "Шани"),
+        new AstroEntity("Хирон", "⚷", SE_AST_OFFSET + 2060, "Chiron"),
         new AstroEntity("Уран", "♅", SE_URANUS, "Uranus"),
         new AstroEntity("Нептун", "♆", SE_NEPTUNE, "Neptune"),
         new AstroEntity("Плутон", "⯓", SE_PLUTO, "Pluto")
@@ -141,7 +152,6 @@ public class AstroRegistry {
      * Кентавры: малые тела с орбитами между Юпитером и Нептуном.
      */
     private static final AstroEntity[] CENTAURS = {
-        new AstroEntity("Хирон", "⚷", SE_AST_OFFSET + 2060, "Chiron"),
         // TODO: добавить Фол, Асбол, Несс и др.
     };
 
@@ -149,7 +159,6 @@ public class AstroRegistry {
      * Астероиды: основные астероиды 1-й группы.
      */
     private static final AstroEntity[] ASTEROIDS = {
-        new AstroEntity("Церера", "⚳", SE_AST_OFFSET + 1, "Ceres"),
         // TODO: добавить Палладу, Юнону, Весту и др.
     };
 
@@ -177,19 +186,19 @@ public class AstroRegistry {
      * Регистрация пользовательской сущности.
      */
     public void registerUserDefined(AstroEntity entity) {
-        userDefinedAstras.add(entity);
         register(entity);
+        userDefinedAstras.add(entity);
     }
 
     /**
      * Инициализация реестра: поочерёдная регистрация всех категорий.
      */
     public void init() {
-        loadUserDefinedAstras();
-        Arrays.stream(PLANETS).forEach(this::register);
+        Arrays.stream(MAIN_ASTRAS).forEach(this::register);
         Arrays.stream(LUNAR_POINTS).forEach(this::register);
         Arrays.stream(CENTAURS).forEach(this::register);
         Arrays.stream(ASTEROIDS).forEach(this::register);
+        loadUserDefinedAstras();
         userDefinedAstras.forEach(this::register);
     }
 }

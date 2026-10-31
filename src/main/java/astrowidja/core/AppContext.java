@@ -8,7 +8,11 @@ import astrowidja.model.NodeType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,9 +72,10 @@ public class AppContext {
             // Если файла нет, прога работает на дефолтах, создадим файл при выходе
             return;
         }
-        try (InputStream is = Files.newInputStream(settingsFilePath)) {
+        try (InputStream is = Files.newInputStream(settingsFilePath);
+             InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             Properties props = new Properties();
-            props.load(is);
+            props.load(isr);
 
             // Читаем значения из файла, если строки кривые — сработает дефолт
             if (props.containsKey("calcMethod"))
@@ -97,18 +102,18 @@ public class AppContext {
     public void saveSettings() {
         try {
             Files.createDirectories(settingsFilePath.getParent());
-            try (OutputStream os = Files.newOutputStream(settingsFilePath)) {
-                Properties props = new Properties();
-                props.setProperty("calcMethod", currentSettings.getCalcMethod().name());
-                props.setProperty("nodeType", currentSettings.getNodeType().name());
-                props.setProperty("lilithType", currentSettings.getLilithType().name());
-                String activeAstrasLine = String.join(",", currentSettings.getAstrasToCalculate());
-                props.setProperty("activeAstras", activeAstrasLine);
+            try (OutputStream os = Files.newOutputStream(settingsFilePath);
+                 OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
+                 PrintWriter pw = new PrintWriter(osw)) {
 
-                props.store(os, "AstroWidja Settings");
+                pw.println("# AstroWidja Settings");
+                pw.printf("calcMethod=%s%n", currentSettings.getCalcMethod().name());
+                pw.printf("nodeType=%s%n", currentSettings.getNodeType().name());
+                pw.printf("lilithType=%s%n", currentSettings.getLilithType().name());
+                pw.printf("activeAstras=%s%n", String.join(",", currentSettings.getAstrasToCalculate()));
+                pw.flush();
+
                 System.out.println("Настройки успешно сохранены в " + settingsFilePath);
-                //TODO: это всё логирование куда-нибудь прикрутить,
-                // там же и история расчётов и т.п.
             }
         } catch (IOException e) {
             System.err.println("Не удалось сохранить настройки: " + e.getMessage());

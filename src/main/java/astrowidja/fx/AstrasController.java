@@ -39,7 +39,7 @@ public class AstrasController {
         for (int i = 0; i < allAstras.size(); i++) {
             AstroEntity entity = allAstras.get(i);
 
-            // Строим один аккуратный ряд: Чекбокс + Символ + Название
+            // Строим стандартный ряд: Чекбокс + Символ + Название
             HBox row = new HBox(12.0); // Отступ между элементами ряда
             row.setAlignment(Pos.CENTER_LEFT);
 
