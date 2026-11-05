@@ -1,6 +1,6 @@
 package astrowidja.core;
 
-import astrowidja.model.Chart;
+import astrowidja.model.charts.Chart;
 import astrowidja.provider.AstroDataProvider;
 import astrowidja.provider.CalcMethod;
 import astrowidja.model.LilithType;

@@ -38,14 +38,16 @@ public class AstrasController {
         // Колонка 1 (Основные 12)
         for (AstroEntity entity : registry.getDefaultBodies())
             mainAstrasGroup.getChildren().add(createAstraRow(entity));
+
         // Колонка 2 (Лунные узлы/аспиды и их переключатели)
         AstroEntity[] lunarPoints = registry.getLunarPoints();
         lunarAstrasGroup.getChildren().add(createAstraRow(lunarPoints[0]));
         lunarAstrasGroup.getChildren().add(createNodeRadioGroup(currentSettings));
         lunarAstrasGroup.getChildren().add(createAstraRow(lunarPoints[1]));
         lunarAstrasGroup.getChildren().add(createLilithRadioGroup(currentSettings));
+
         // Надстройка ещё колонок для юзерских астр справа
-        List<AstroEntity> userAstras = appContext.getAstroRegistry().getUserDefinedAstras();
+        List<AstroEntity> userAstras = registry.getUserDefinedAstras();
         buildUserColumns(userAstras);
     }
 

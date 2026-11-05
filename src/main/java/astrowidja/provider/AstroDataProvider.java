@@ -37,13 +37,15 @@ public class AstroDataProvider {
 
         double jdUT = getJdUT(date, timeUtc);
 
+        // битовая маска флагов (аналитический расчёт без файлов эфемерид)
+        int flags = SweConst.SEFLG_SPEED | SweConst.SEFLG_MOSEPH;
+
         // [0] - долгота, [1] - широта, [2] - расстояние,
         // [3] - скорость по долготе, [4] - скорость по широте, [5] - лучевая скорость
         double[] xp = new double[6]; // сюда сишный метод впишет ответ
+
         StringBuffer serr = new StringBuffer(); // сюда сишный метод запишет ошибку или замечание
 
-        // битовая маска флагов (аналитический расчёт без файлов эфемерид)
-        int flags = SweConst.SEFLG_SPEED | SweConst.SEFLG_MOSEPH;
 
         int status = swisseph.swe_calc_ut(jdUT, planetId, flags, xp, serr);
         // TODO: надо будет вздымать окошко с уведомлением, если статус не равен 0

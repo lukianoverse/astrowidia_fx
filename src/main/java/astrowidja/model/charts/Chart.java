@@ -1,6 +1,9 @@
-package astrowidja.model;
+package astrowidja.model.charts;
 
+import astrowidja.model.Astra;
+import astrowidja.model.AstroEntity;
 import astrowidja.provider.AstroDataProvider;
+import astrowidja.provider.TimeSpacePoint;
 
 import java.time.*;
 import java.util.ArrayList;
@@ -9,7 +12,12 @@ import java.util.List;
 public class Chart {
     private String name;
     private LocalDateTime moment;
-    private List<Astra> astras = new ArrayList<>();
+    private final List<Astra> astras = new ArrayList<>();
+
+    public Chart(String name, TimeSpacePoint timeAndSpacePoint, List<AstroEntity> entitiesToCalculate, AstroDataProvider dataProvider) {
+        this.name = name;
+        this.moment = timeAndSpacePoint.getMoment();
+    }
 
     public String getName() {
         return name;

@@ -2,8 +2,9 @@ package astrowidja.fx;
 
 import astrowidja.core.AstroRegistry;
 import astrowidja.core.Settings;
-import astrowidja.model.Chart;
+import astrowidja.model.charts.Chart;
 import astrowidja.provider.AstroDataProvider;
+import astrowidja.provider.TimeSpacePoint;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -89,17 +90,11 @@ public class WorkController {
     @FXML
     void onCalculateClick(ActionEvent event) {
         LocalDate selectedDate = datePicker.getValue();
-        if (selectedDate == null) {
-            resultTextArea.setText("Пожалуйста, выберите дату.");
-            return;
-        }
+        LocalTime localTime = LocalTime.of(hourSetter.getValue(), minuteSetter.getValue());
+        ZoneId zoneId = ZoneId.of(timezoneSelector.getValue());
 
-        int hours = hourSetter.getValue();
-        int minutes = minuteSetter.getValue();
-        String zoneIdString = timezoneSelector.getValue();
+        TimeSpacePoint moment = new TimeSpacePoint(selectedDate, localTime, zoneId);
 
-        LocalTime localTime = LocalTime.of(hours, minutes);
-        ZoneId zoneId = ZoneId.of(zoneIdString);
         ZonedDateTime localMoment = ZonedDateTime.of(selectedDate, localTime, zoneId);
         ZonedDateTime utcMoment = localMoment.withZoneSameInstant(ZoneId.of("UTC"));
 
@@ -108,14 +103,16 @@ public class WorkController {
 
         Chart chart = new Chart(
                 "Карта",
-                utcDate,
-                utcTime,
+                moment,
                 registry.getEntitiesToCalculate(currentSettings.getAstrasToCalculate()),
                 dataProvider);
         appContext.setActiveChart(chart);
 
-        String output = "Местное время:  %s %s (%s)\n".formatted(selectedDate, localTime, zoneIdString)
-                + "Расчётный момент: %s %s UTC\n".formatted(utcDate, utcTime)
+        String output =
+                "Местное время:  %s %s (%s)\n"
+                    .formatted(selectedDate, localTime, timezoneSelector.getValue())
+                + "Расчётный момент: %s %s UTC\n"
+                    .formatted(utcDate, utcTime)
                 + "========================================\n"
                 + appContext.getActiveChart();
 

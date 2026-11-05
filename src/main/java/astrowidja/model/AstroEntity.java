@@ -1,8 +1,5 @@
 package astrowidja.model;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,21 +47,6 @@ public class AstroEntity {
      */
     private final Supplier<Integer> idProvider;
 
-
-//    private final BooleanProperty calculated = new SimpleBooleanProperty(false);
-//
-//
-//    public BooleanProperty calculatedProperty() {
-//        return calculated;
-//    }
-//
-//    public boolean isCalculated() {
-//        return calculated.get();
-//    }
-//
-//    public void setCalculated(boolean calculated) {
-//        this.calculated.set(calculated);
-//    }
 
     /**
      * Полный конструктор для создания астросущности с динамическим поставщиком ID.

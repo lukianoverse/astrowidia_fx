@@ -1,5 +1,6 @@
 package astrowidja.model;
 
+import astrowidja.model.charts.Chart;
 import astrowidja.provider.SweCalcResult;
 import astrowidja.utils.CelestialMechanics;
 
