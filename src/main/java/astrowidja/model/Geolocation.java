@@ -1,11 +1,12 @@
-package astrowidja.provider;
+package astrowidja.model;
 
 public record Geolocation(
-    String cityName,
     double latitude,
     double longitude,
     double altitude,
-    String ianaTimezone) {
+    String ianaTimezone,
+    String cityName
+    ) {
 
 //    private String ianaTimezone;
 //    private int rawOffsetMinutes;

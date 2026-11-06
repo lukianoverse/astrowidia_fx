@@ -10,11 +10,19 @@ public class AstroDataProvider {
     // TODO: подумать над архитектурой интерфейса
     //  (разные провайдеры дают данные по-разному)
 
-    private final SwissEph swisseph;
+    private SwissEph epheMachine;
 
     public AstroDataProvider() {
         // Пути к эфемеридам не устанавливаем, используем аналитический расчёт
-        this.swisseph = new SwissEph();
+        this.epheMachine = new SwissEph();
+    }
+
+    public void init() {
+        this.epheMachine = new SwissEph();
+    }
+
+    public void init(String ephePath) {
+        this.epheMachine = new SwissEph(ephePath);
     }
 
     /**
@@ -47,7 +55,7 @@ public class AstroDataProvider {
         StringBuffer serr = new StringBuffer(); // сюда сишный метод запишет ошибку или замечание
 
 
-        int status = swisseph.swe_calc_ut(jdUT, planetId, flags, xp, serr);
+        int status = epheMachine.swe_calc_ut(jdUT, planetId, flags, xp, serr);
         // TODO: надо будет вздымать окошко с уведомлением, если статус не равен 0
 
         return new SweCalcResult(status, xp, serr.toString());

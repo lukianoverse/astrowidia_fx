@@ -4,7 +4,7 @@ import astrowidja.core.AstroRegistry;
 import astrowidja.core.Settings;
 import astrowidja.model.charts.Chart;
 import astrowidja.provider.AstroDataProvider;
-import astrowidja.provider.TimeSpacePoint;
+import astrowidja.model.TimeSpacePoint;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;

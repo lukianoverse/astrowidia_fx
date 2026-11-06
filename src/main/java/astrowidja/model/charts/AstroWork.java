@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class StarCase {
+public class AstroWork {
     private final String id;
     private String title;
     //    private CaseType type;
@@ -16,11 +16,11 @@ public class StarCase {
     private List<String> linkedCasesIDs;
 
 
-    public StarCase() {
+    public AstroWork() {
         this.id = UUID.randomUUID().toString();
     }
 
-    public StarCase(String title) {
+    public AstroWork(String title) {
         this();
         this.title = title;
     }

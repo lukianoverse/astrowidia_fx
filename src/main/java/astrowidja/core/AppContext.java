@@ -18,6 +18,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import static astrowidja.provider.CalcMethod.*;
+
 public class AppContext {
     private static AppContext instance;
     /**
@@ -53,7 +55,10 @@ public class AppContext {
         // путь к репозиторию карт: ./awdata
         Path awdataFolder = rootDir.resolve("awdata");
 
-        // Попутно создадим папку для списков AWD, если её ещё нет,
+        // путь к базе эфемерид: ./ephe
+        Path epheFolder = rootDir.resolve("ephe");
+
+        // Создадим папку для списков AWD, если её ещё нет,
         // чтобы AWDFileChartRepository не ругался при старте
         if (!Files.exists(awdataFolder)) {
             try {
@@ -63,6 +68,16 @@ public class AppContext {
                         + awdataFolder.toAbsolutePath().normalize());
             } catch (IOException e) {
                 System.err.println("Не удалось создать папку awdata: " + e.getMessage());
+            }
+        }
+        //  и папку эфемерид пока здесь же по умолчанию
+        if (!Files.exists(epheFolder)) {
+            try {
+                Files.createDirectories(epheFolder);
+                System.out.println("Создана локальная папка эфемерид: "
+                        + epheFolder.toAbsolutePath().normalize());
+            } catch (IOException e) {
+                System.err.println("Не удалось создать папку ephe: " + e.getMessage());
             }
         }
     }
@@ -79,7 +94,7 @@ public class AppContext {
 
             // Читаем значения из файла, если строки кривые — сработает дефолт
             if (props.containsKey("calcMethod"))
-                currentSettings.setCalcMethod(CalcMethod.valueOf(props.getProperty("calcMethod")));
+                currentSettings.setCalcMethod(valueOf(props.getProperty("calcMethod")));
             if (props.containsKey("nodeType"))
                 currentSettings.setNodeType(NodeType.valueOf(props.getProperty("nodeType")));
             if (props.containsKey("lilithType"))
@@ -140,13 +155,20 @@ public class AppContext {
     public static synchronized AppContext getInstance() {
         if (instance == null) {
             instance = new AppContext();
-            postConstruct();
+            instance.postConstruct();
         }
         return instance;
     }
 
-    private static void postConstruct() {
-        instance.astroRegistry.init();
+    private void postConstruct() {
+        // инициализируем набор активных астросущностей
+        astroRegistry.init();
+        // запускаем астро-движок
+        CalcMethod calcMethod = currentSettings.getCalcMethod();
+        if (calcMethod == MOSHIER)
+            dataProvider.init();
+        if (calcMethod == SWISSEPH)
+            dataProvider.init("./ephe");
     }
 
 
