@@ -35,20 +35,20 @@ public class Chart {
         this.name = name;
     }
 
-    public Chart(String name,
-                 LocalDate date,
-                 LocalTime time,
-                 List<AstroEntity> entities,
-                 AstroDataProvider dataProvider) {
-        this.name = name;
-        this.moment = LocalDateTime.of(date, time);
-        entities.forEach(entity
-                -> astras.add(new Astra(entity,
-                        this,
-                        dataProvider.getPlanetEphemeris(date, time, entity.getSwissId())
-                )
-        ));
-    }
+//    public Chart(String name,
+//                 LocalDate date,
+//                 LocalTime time,
+//                 List<AstroEntity> entities,
+//                 AstroDataProvider dataProvider) {
+//        this.name = name;
+//        this.moment = LocalDateTime.of(date, time);
+//        entities.forEach(entity
+//                -> astras.add(new Astra(entity,
+//                        this,
+//                        dataProvider.getPlanetEphemeris(date, time, entity.getSwissId())
+//                )
+//        ));
+//    }
 
     @Override
     public String toString() {

@@ -2,10 +2,13 @@ package astrowidja.fx;
 
 import astrowidja.core.AstroRegistry;
 import astrowidja.core.Settings;
-import astrowidja.model.charts.Chart;
+import astrowidja.model.charts.AstroSituation;
+import astrowidja.model.charts.AstroWork;
+import astrowidja.model.charts.NaturalSituation;
 import astrowidja.provider.AstroDataProvider;
 import astrowidja.model.TimeSpacePoint;
 import astrowidja.model.TimeSpacePointFactory;
+import astrowidja.provider.SituationCalcResult;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -19,7 +22,7 @@ import javafx.util.StringConverter;
 public class WorkController {
 
     private final AppContext appContext = AppContext.getInstance();
-    private final AstroDataProvider dataProvider = appContext.getDataProvider();
+    private final AstroDataProvider astroEngine = appContext.getDataProvider();
     private final Settings currentSettings = appContext.getCurrentSettings();
     private final AstroRegistry registry = appContext.getAstroRegistry();
 
@@ -95,18 +98,25 @@ public class WorkController {
                 LocalDateTime.of(selectedDate, localTime), zoneId.getId()
         );
 
-//        ZonedDateTime localMoment = ZonedDateTime.of(selectedDate, localTime, zoneId);
-//        ZonedDateTime utcMoment = localMoment.withZoneSameInstant(ZoneId.of("UTC"));
-//
-//        LocalDate utcDate = utcMoment.toLocalDate();
-//        LocalTime utcTime = utcMoment.toLocalTime();
-
-        Chart chart = new Chart(
-                "Карта",
+        AstroWork work = new AstroWork("Карта");
+        AstroSituation situation = new NaturalSituation();
+        SituationCalcResult calculated = astroEngine.calculateSituation(
                 moment,
-                registry.getEntitiesToCalculate(currentSettings.getAstrasToCalculate()),
-                dataProvider);
-        appContext.setActiveChart(chart);
+                currentSettings.getCurrentModus(),
+                registry.getEntitiesToCalculate(),
+                situation
+        );
+        situation.addAstras(calculated.astras());
+        if (calculated.hasWarning()) {
+            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+            infoAlert.setTitle("Примечания к расчету");
+            infoAlert.setHeaderText("Некоторые астросущности рассчитаны в резервном режиме:");
+            infoAlert.setContentText(calculated.report());
+            infoAlert.show();
+        }
+        work.addSituation(situation);
+
+        appContext.setActiveChart(work);
 
         String output =
                 "Местное время:  %s %s (%s)\n"
@@ -114,7 +124,7 @@ public class WorkController {
 //                + "Расчётный момент: %s %s UTC\n"
 //                    .formatted(utcDate, utcTime)
                 + "========================================\n"
-                + appContext.getActiveChart();
+                + appContext.getActiveChart().info();
 
         resultTextArea.setText(output);
     }

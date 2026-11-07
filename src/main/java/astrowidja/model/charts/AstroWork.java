@@ -9,11 +9,11 @@ public class AstroWork {
     private String title;
     //    private CaseType type;
     // конкретные снимки неба
-    private List<AstroSituation> situations = new ArrayList<>();
+    private final List<AstroSituation> situations = new ArrayList<>();
     // метаинформация
     private String comment;
-    private List<String> tags = new ArrayList<>();
-    private List<String> linkedWorksIDs;
+    private final List<String> tags = new ArrayList<>();
+    private final List<String> linkedWorksIDs = new ArrayList<>();
 
 
     public AstroWork() {
@@ -25,6 +25,28 @@ public class AstroWork {
         this.title = title;
     }
 
+    public void addSituation(AstroSituation situation) {
+        situations.add(situation);
+    }
+
+    public void addTag(String tag) {
+        tags.add(tag);
+    }
+
+    public void addLinkedWork(String workId) {
+        linkedWorksIDs.add(workId);
+    }
+
+    public void removeLinkedWork(String workId) {
+        linkedWorksIDs.remove(workId);
+    }
+    public void removeTag(String tag) {
+        tags.remove(tag);
+    }
+
+    public void removeSituation(AstroSituation situation) {
+        situations.remove(situation);
+    }
 
     public boolean isSingle() {
         return situations.size() == 1;
@@ -65,5 +87,15 @@ public class AstroWork {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String info() {
+        StringBuilder desc = new StringBuilder();
+        desc.append(title).append("\n");
+        for (AstroSituation situation : situations)
+            desc.append(situation.getName())
+                    .append(" (%s)\n".formatted(situation.getActualType()))
+                    .append(situation.info()).append("\n");
+        return desc.toString();
     }
 }

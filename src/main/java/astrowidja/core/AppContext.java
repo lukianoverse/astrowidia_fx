@@ -1,8 +1,11 @@
 package astrowidja.core;
 
-import astrowidja.model.charts.Chart;
+import astrowidja.model.charts.AstroWork;
 import astrowidja.provider.AstroDataProvider;
+import astrowidja.provider.AyanamshaMode;
 import astrowidja.provider.CalcMethod;
+import astrowidja.provider.ProjectionPlane;
+import astrowidja.provider.ReferencePoint;
 import astrowidja.model.LilithType;
 import astrowidja.model.NodeType;
 
@@ -16,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.Properties;
 
 import static astrowidja.provider.CalcMethod.*;
@@ -38,12 +42,14 @@ public class AppContext {
     /**
      * Карта, активная в данный момент. То есть отображаемая и доступная для расчётов.
      */
-    private Chart activeChart = null;
+    private AstroWork activeChart = null;
 
     private AppContext() {
         initSettingsPath();
         loadSettings();
     }
+
+    // TODO: добавить в настройки пути к базе данных и к эфемеридам
 
     private void initSettingsPath() {
         // строго локально в папке запуска программы
@@ -94,7 +100,15 @@ public class AppContext {
 
             // Читаем значения из файла, если строки кривые — сработает дефолт
             if (props.containsKey("calcMethod"))
-                currentSettings.setCalcMethod(valueOf(props.getProperty("calcMethod")));
+                currentSettings.setCalcMethod(CalcMethod.valueOf(props.getProperty("calcMethod")));
+            if (props.containsKey("referencePoint"))
+                currentSettings.setReferencePoint(ReferencePoint.valueOf(props.getProperty("referencePoint")));
+            if (props.containsKey("ayanamsha"))
+                currentSettings.setAyanamsha(AyanamshaMode.valueOf(props.getProperty("ayanamsha")));
+            if (props.containsKey("projectionPlane"))
+                currentSettings.setProjectionPlane(ProjectionPlane.valueOf(props.getProperty("projectionPlane")));
+            if (props.containsKey("userAyanamshaOffset"))
+                currentSettings.setUserAyanamshaOffset(Double.parseDouble(props.getProperty("userAyanamshaOffset")));
             if (props.containsKey("nodeType"))
                 currentSettings.setNodeType(NodeType.valueOf(props.getProperty("nodeType")));
             if (props.containsKey("lilithType"))
@@ -123,6 +137,10 @@ public class AppContext {
 
                 pw.println("# AstroWidja Settings");
                 pw.printf("calcMethod=%s%n", currentSettings.getCalcMethod().name());
+                pw.printf("referencePoint=%s%n", currentSettings.getReferencePoint().name());
+                pw.printf("ayanamsha=%s%n", currentSettings.getAyanamsha().name());
+                pw.printf("projectionPlane=%s%n", currentSettings.getProjectionPlane().name());
+                pw.printf(Locale.ROOT,"userAyanamshaOffset=%.4f%n", currentSettings.getUserAyanamshaOffset());
                 pw.printf("nodeType=%s%n", currentSettings.getNodeType().name());
                 pw.printf("lilithType=%s%n", currentSettings.getLilithType().name());
                 pw.printf("activeAstras=%s%n", String.join(",", currentSettings.getAstrasToCalculate()));
@@ -135,11 +153,11 @@ public class AppContext {
         }
     }
 
-    public void setActiveChart(Chart activeChart) {
+    public void setActiveChart(AstroWork activeChart) {
         this.activeChart = activeChart;
     }
 
-    public Chart getActiveChart() {
+    public AstroWork getActiveChart() {
         return activeChart;
     }
 

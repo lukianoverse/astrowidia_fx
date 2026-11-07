@@ -28,7 +28,24 @@ public class AWApplication extends Application {
 //        stage.setMaximized(true);
 
         // при закрытии сохраняем настройки в ini-файл
-        stage.setOnCloseRequest(event -> AppContext.getInstance().saveSettings());
+//        stage.setOnCloseRequest(event -> AppContext.getInstance().saveSettings());
         stage.show();
     }
+
+    /**
+     * Вызывается автоматически платформой JavaFX при закрытии приложения
+     */
+    @Override
+    public void stop() throws Exception {
+        System.out.println("Запущена процедура завершения АстроВидьи...");
+
+        // 1. Сохраняем текущие настройки пользователя (раз уж мы выходим)
+        AppContext.getInstance().saveSettings();
+
+        // 2. Тушим эфемеридную машину и освобождаем файлы дескрипторов
+        AppContext.getInstance().getDataProvider().shutdown();
+
+        super.stop();
+    }
+
 }

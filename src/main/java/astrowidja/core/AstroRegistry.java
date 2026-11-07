@@ -19,6 +19,7 @@ public class AstroRegistry {
 
     private final List<AstroEntity> registry = new ArrayList<>();
 
+
     // Массив объектов, доступных для расчета без файлов эфемерид (по Мошьеру)
     public static final int[] MOSHIERABLE = {
             SE_SUN,
@@ -35,7 +36,9 @@ public class AstroRegistry {
             SE_MEAN_APOG
     };
 
-    public List<AstroEntity> getEntitiesToCalculate(ObservableList<String> astrasToCalculate) {
+    public List<AstroEntity> getEntitiesToCalculate() {
+        ObservableList<String> astrasToCalculate = AppContext.getInstance()
+                .getCurrentSettings().getAstrasToCalculate();
         return astrasToCalculate.stream()
                 .map(this::findByName)
                 .filter(Optional::isPresent)

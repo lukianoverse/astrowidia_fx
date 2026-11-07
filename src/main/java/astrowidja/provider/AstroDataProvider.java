@@ -5,11 +5,8 @@ import astrowidja.model.AstroEntity;
 import astrowidja.model.Geolocation;
 import astrowidja.model.TimeSpacePoint;
 import astrowidja.model.charts.AstroSituation;
-import swisseph.SweConst;
-import swisseph.SweDate;
 import swisseph.SwissEph;
-import java.time.LocalDate;
-import java.time.LocalTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +16,6 @@ public class AstroDataProvider {
 
     private SwissEph epheMachine;
 
-    public AstroDataProvider() {
-        // Пути к эфемеридам не устанавливаем, используем аналитический расчёт
-        this.epheMachine = new SwissEph();
-    }
 
     public void init() {
         this.epheMachine = new SwissEph();
@@ -32,28 +25,37 @@ public class AstroDataProvider {
         this.epheMachine = new SwissEph(ephePath);
     }
 
+
     /**
-     * Рассчитывает эфемериду (данные о положении и скорости) тела из SwissEph.
-     * Это сишный метод, работающий непривычным для Явы способом.
-     * @param date дата в формате LocalDate
-     * @param timeUtc время в формате LocalTime
-     * @param planetId ID планеты в Swiss Ephemeris
-     * @return объект, инкорпорирующий результат исполнения метода {@code swe_calc_ut}
+     * Рассчитывает эфемериду (данные о положении и скорости) небесного тела средствами Swiss Ephemeris.
+     * <p>
+     * Вызывает нативный (Сишный) метод {@code swe_calc_ut}, работающий непривычным для Java способом:
+     * результат записывается в передаваемые массив и буфер, а не возвращается напрямую.
+     * <p>
+     * При использовании аналитического расчёта (Moshier) проверяется допустимый диапазон дат —
+     * от 1350 г. до н.э. до 3000 г. н.э.
+     *
+     * @param tsp      объект, содержащий момент времени и пространственные параметры (включая юлианскую дату JD UT)
+     * @param modus    режим расчёта, определяющий используемый метод (Swiss Ephemeris, Moshier и т.д.)
+     *                 и соответствующие флаги для Swiss Ephemeris
+     * @param planetId идентификатор планеты в Swiss Ephemeris
+     * @return объект {@link SweCalcResult}, инкорпорирующий результат исполнения метода {@code swe_calc_ut}:
+     *         статус, массив координат и скоростей
+     *         ([0] — долгота, [1] — широта, [2] — расстояние,
+     *         [3] — скорость по долготе, [4] — скорость по широте, [5] — лучевая скорость)
+     *         и строку с ошибкой или замечанием
+     * @throws IllegalArgumentException если выбран метод Moshier, а год даты выходит
+     *                                  за допустимый диапазон (раньше -1349 или позже 3000)
      */
-    public SweCalcResult getPlanetEphemeris(LocalDate date, LocalTime timeUtc, int planetId) {
+    public SweCalcResult getPlanetEphemeris(TimeSpacePoint tsp, ModusCalculationis modus, int planetId) {
         // Проверка диапазона приемлемых дат
-        int year = date.getYear();
-        if (year < -1349 || year > 3000) {
+        int year = tsp.getYear();
+        // TODO: поместить эту проверку в контроллер (?) и поставить в зависимость от текущего способа расчёта
+        if (modus.getCalcMethod() == CalcMethod.MOSHIER
+                && (year < -1349 || year > 3000))
             throw new IllegalArgumentException(
                     "При использовании аналитического расчёта допустима дата"
                             + " от 1350 г. до н.э. до 3000 г. н.э. (получено: " + year + ")");
-        }
-        // TODO: поместить эту проверку в контроллер (?) и поставить в зависимость от текущего способа расчёта
-
-        double jdUT = getJdUT(date, timeUtc);
-
-        // битовая маска флагов (аналитический расчёт без файлов эфемерид)
-        int flags = SweConst.SEFLG_SPEED | SweConst.SEFLG_MOSEPH;
 
         // [0] - долгота, [1] - широта, [2] - расстояние,
         // [3] - скорость по долготе, [4] - скорость по широте, [5] - лучевая скорость
@@ -61,37 +63,38 @@ public class AstroDataProvider {
 
         StringBuffer serr = new StringBuffer(); // сюда сишный метод запишет ошибку или замечание
 
-
-        int status = epheMachine.swe_calc_ut(jdUT, planetId, flags, xp, serr);
-        // TODO: надо будет вздымать окошко с уведомлением, если статус не равен 0
+        int status = epheMachine.swe_calc_ut(tsp.getJdUT(), planetId, modus.getSwissEphFlags(), xp, serr);
+        // TODO: вздымать окошко с уведомлением, если статус не равен 0
 
         return new SweCalcResult(status, xp, serr.toString());
     }
 
-    private static double getJdUT(LocalDate date, LocalTime timeUtc) {
-        double hourFraction = timeUtc.getHour()
-                + timeUtc.getMinute() / 60.0
-                + timeUtc.getSecond() / 3600.0;
-        SweDate sweDate = new SweDate(
-                date.getYear(),
-                date.getMonthValue(),
-                date.getDayOfMonth(),
-                hourFraction
-        );
-        return sweDate.getJulDay();
-    }
-
-    public List<Astra> calculatePositions(
+    public SituationCalcResult calculateSituation(
             TimeSpacePoint tsp,
             ModusCalculationis modus, // Принимаем локальный способ расчета именно этой карты!
             List<AstroEntity> entities,
             AstroSituation situationContext
     ) {
-        int flags = modus.getSwissEphFlags();
-        double jdT = tsp.getJdUT();
-
         // задаём режим работы ЭфеМашины
+        setEngineMode(tsp, modus);
 
+        List<Astra> astras = new ArrayList<>();
+        StringBuilder report = new StringBuilder();
+
+        for (AstroEntity entity : entities) {
+            // Машина использует состояние, инициализированное выше
+            SweCalcResult result = getPlanetEphemeris(tsp, modus, entity.getSwissId());
+            // TODO: бросить исключение, если !result.isCompleted() ?
+            if (!result.isSuccess())
+                report.append("%s: %s%n"
+                        .formatted(entity.getName(), result.getMessage()));
+            astras.add(new Astra(entity, situationContext, result));
+        }
+
+        return new SituationCalcResult(astras, report.toString());
+    }
+
+    private void setEngineMode(TimeSpacePoint tsp, ModusCalculationis modus) {
         if (modus.getAyanamsha() != AyanamshaMode.TROPICAL) {
             // TROPICAL стоит по умолчанию, если нет флага SEFLG_SIDEREAL
             // (в этом случае ранее сделанные настройки аянамши игнорируются)
@@ -109,19 +112,12 @@ public class AstroDataProvider {
             Geolocation place = tsp.getGeolocation();
             epheMachine.swe_set_topo(place.longitude(), place.latitude(), place.altitude());
         }
-
-        // собственно расчёт положений
-        List<Astra> resultList = new ArrayList<>();
-        for (AstroEntity entity : entities) {
-            // Машина использует состояние, инициализированное выше
-
-            int status = epheMachine.swe_calc_ut(jdT, entity.getSwissId(), flags, xp, serr);
-            SweCalcResult result = getPlanetEphemeris();
-
-            resultList.add(new Astra(entity, situationContext, result));
-        }
-
-        return resultList;
     }
 
+    public void shutdown() {
+        if (this.epheMachine != null) {
+            this.epheMachine.swe_close();
+            System.out.println("Эфемеридная машина SwissEph остановлена, файлы закрыты.");
+        }
+    }
 }

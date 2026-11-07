@@ -1,7 +1,6 @@
 package astrowidja.model;
 
 import swisseph.SweDate;
-import swisseph.SwissEph;
 
 import java.time.*;
 
@@ -27,15 +26,18 @@ public class TimeSpacePoint {
         return sweDate;
     }
 
-//    public ZonedDateTime getZonedDateTime() {
-//        return zonedDateTime;
-//    }
+    public ZonedDateTime getZonedDateTime() {
+        return zonedDateTime;
+    }
 
 
     public double getJdUT() {
         return sweDate.getJulDay();
     }
-    // Держим один экземпляр в памяти, чтобы не плодить объекты
+
+    public int getYear() {
+        return sweDate.getYear();
+    }
 
     /**
      * Указывает, определено ли для этих входных данных
@@ -48,10 +50,10 @@ public class TimeSpacePoint {
         return !Double.isNaN(geolocation.latitude())
                 && !Double.isNaN(geolocation.longitude());
     }
-
     public TimeSpacePoint(LocalDateTime localDateTime, Geolocation geolocation) {
         updateAll(localDateTime, geolocation);
     }
+
     public void updateAll(LocalDateTime localDateTime, Geolocation geolocation) {
         this.localDateTime = localDateTime;
         this.geolocation = geolocation;
@@ -83,50 +85,49 @@ public class TimeSpacePoint {
         );
 //        this.julianDayUT = sweDate.getJulDay();
     }
+//    /**
+//     * Получает объект вводных данных на основе UTC,
+//     * без указания положения на поверхности Земли.
+//     *
+//     * @param date    дата для UTC в формате LocalDate.
+//     * @param timeUtc время UTC в формате LocalTime
+//     */
+//    public TimeSpacePoint(LocalDate date, LocalTime timeUtc) {
+//        double hourFraction = timeUtc.getHour()
+//                + timeUtc.getMinute() / 60.0
+//                + timeUtc.getSecond() / 3600.0;
+//        this.sweDate = new SweDate(
+//                date.getYear(),
+//                date.getMonthValue(),
+//                date.getDayOfMonth(),
+//                hourFraction);
+//        geolocation = null;
 
-    /**
-     * Получает объект вводных данных на основе UTC,
-     * без указания положения на поверхности Земли.
-     *
-     * @param date    дата для UTC в формате LocalDate.
-     * @param timeUtc время UTC в формате LocalTime
-     */
-    public TimeSpacePoint(LocalDate date, LocalTime timeUtc) {
-        double hourFraction = timeUtc.getHour()
-                + timeUtc.getMinute() / 60.0
-                + timeUtc.getSecond() / 3600.0;
-        this.sweDate = new SweDate(
-                date.getYear(),
-                date.getMonthValue(),
-                date.getDayOfMonth(),
-                hourFraction);
-        geolocation = null;
-    }
+//    }
+//    /**
+//     * Получает объект вводных данных на основе местных даты, времени и часового пояса.
+//     *
+//     * @param localDate местная дата.
+//     * @param localTime местное время.
+//     * @param zoneId    часовой пояс.
+//     */
+//    public TimeSpacePoint(LocalDate localDate, LocalTime localTime, ZoneId zoneId) {
+//        ZonedDateTime localMoment = ZonedDateTime.of(localDate, localTime, zoneId);
+//        ZonedDateTime utcMoment = localMoment.withZoneSameInstant(ZoneId.of("UTC"));
+//
+//        LocalDate utcDate = utcMoment.toLocalDate();
+//        LocalTime utcTime = utcMoment.toLocalTime();
+//
+//        double hourFraction = utcTime.getHour()
+//                + utcTime.getMinute() / 60.0
+//                + utcTime.getSecond() / 3600.0;
+//        this.sweDate = new SweDate(
+//                utcDate.getYear(),
+//                utcDate.getMonthValue(),
+//                utcDate.getDayOfMonth(),
+//                hourFraction);
+//        geolocation = null;
 
-    /**
-     * Получает объект вводных данных на основе местных даты, времени и часового пояса.
-     *
-     * @param localDate местная дата.
-     * @param localTime местное время.
-     * @param zoneId    часовой пояс.
-     */
-    public TimeSpacePoint(LocalDate localDate, LocalTime localTime, ZoneId zoneId) {
-        ZonedDateTime localMoment = ZonedDateTime.of(localDate, localTime, zoneId);
-        ZonedDateTime utcMoment = localMoment.withZoneSameInstant(ZoneId.of("UTC"));
-
-        LocalDate utcDate = utcMoment.toLocalDate();
-        LocalTime utcTime = utcMoment.toLocalTime();
-
-        double hourFraction = utcTime.getHour()
-                + utcTime.getMinute() / 60.0
-                + utcTime.getSecond() / 3600.0;
-        this.sweDate = new SweDate(
-                utcDate.getYear(),
-                utcDate.getMonthValue(),
-                utcDate.getDayOfMonth(),
-                hourFraction);
-        geolocation = null;
-    }
-
+//    }
 
 }
