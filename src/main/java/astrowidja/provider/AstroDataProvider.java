@@ -1,10 +1,17 @@
 package astrowidja.provider;
 
+import astrowidja.model.Astra;
+import astrowidja.model.AstroEntity;
+import astrowidja.model.Geolocation;
+import astrowidja.model.TimeSpacePoint;
+import astrowidja.model.charts.AstroSituation;
 import swisseph.SweConst;
 import swisseph.SweDate;
 import swisseph.SwissEph;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AstroDataProvider {
     // TODO: подумать над архитектурой интерфейса
@@ -73,4 +80,48 @@ public class AstroDataProvider {
         );
         return sweDate.getJulDay();
     }
+
+    public List<Astra> calculatePositions(
+            TimeSpacePoint tsp,
+            ModusCalculationis modus, // Принимаем локальный способ расчета именно этой карты!
+            List<AstroEntity> entities,
+            AstroSituation situationContext
+    ) {
+        int flags = modus.getSwissEphFlags();
+        double jdT = tsp.getJdUT();
+
+        // задаём режим работы ЭфеМашины
+
+        if (modus.getAyanamsha() != AyanamshaMode.TROPICAL) {
+            // TROPICAL стоит по умолчанию, если нет флага SEFLG_SIDEREAL
+            // (в этом случае ранее сделанные настройки аянамши игнорируются)
+            int sidMode = modus.getAyanamsha().getSwissEphConstant();
+
+            if (modus.getAyanamsha() == AyanamshaMode.USER_DEFINED) {
+                // Если юзер определил свой Зодиак, передаём эпоху J2000 и его кастомный сдвиг
+                epheMachine.swe_set_sid_mode(sidMode, 2451545.0, modus.getUserAyanamshaOffset());
+            } else {
+                // Для стандартных систем (Лахири, Раман и т.д.) добавочные параметры равны 0
+                epheMachine.swe_set_sid_mode(sidMode, 0, 0);
+            }
+        }
+        if (modus.getReferencePoint() == ReferencePoint.TOPOCENTRIC) {
+            Geolocation place = tsp.getGeolocation();
+            epheMachine.swe_set_topo(place.longitude(), place.latitude(), place.altitude());
+        }
+
+        // собственно расчёт положений
+        List<Astra> resultList = new ArrayList<>();
+        for (AstroEntity entity : entities) {
+            // Машина использует состояние, инициализированное выше
+
+            int status = epheMachine.swe_calc_ut(jdT, entity.getSwissId(), flags, xp, serr);
+            SweCalcResult result = getPlanetEphemeris();
+
+            resultList.add(new Astra(entity, situationContext, result));
+        }
+
+        return resultList;
+    }
+
 }

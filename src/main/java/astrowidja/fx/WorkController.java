@@ -5,15 +5,13 @@ import astrowidja.core.Settings;
 import astrowidja.model.charts.Chart;
 import astrowidja.provider.AstroDataProvider;
 import astrowidja.model.TimeSpacePoint;
+import astrowidja.model.TimeSpacePointFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import astrowidja.core.AppContext;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.List;
 
 import javafx.util.StringConverter;
@@ -93,13 +91,15 @@ public class WorkController {
         LocalTime localTime = LocalTime.of(hourSetter.getValue(), minuteSetter.getValue());
         ZoneId zoneId = ZoneId.of(timezoneSelector.getValue());
 
-        TimeSpacePoint moment = new TimeSpacePoint(selectedDate, localTime, zoneId);
+        TimeSpacePoint moment = TimeSpacePointFactory.createGeocentric(
+                LocalDateTime.of(selectedDate, localTime), zoneId.getId()
+        );
 
-        ZonedDateTime localMoment = ZonedDateTime.of(selectedDate, localTime, zoneId);
-        ZonedDateTime utcMoment = localMoment.withZoneSameInstant(ZoneId.of("UTC"));
-
-        LocalDate utcDate = utcMoment.toLocalDate();
-        LocalTime utcTime = utcMoment.toLocalTime();
+//        ZonedDateTime localMoment = ZonedDateTime.of(selectedDate, localTime, zoneId);
+//        ZonedDateTime utcMoment = localMoment.withZoneSameInstant(ZoneId.of("UTC"));
+//
+//        LocalDate utcDate = utcMoment.toLocalDate();
+//        LocalTime utcTime = utcMoment.toLocalTime();
 
         Chart chart = new Chart(
                 "Карта",
@@ -111,8 +111,8 @@ public class WorkController {
         String output =
                 "Местное время:  %s %s (%s)\n"
                     .formatted(selectedDate, localTime, timezoneSelector.getValue())
-                + "Расчётный момент: %s %s UTC\n"
-                    .formatted(utcDate, utcTime)
+//                + "Расчётный момент: %s %s UTC\n"
+//                    .formatted(utcDate, utcTime)
                 + "========================================\n"
                 + appContext.getActiveChart();
 

@@ -13,7 +13,7 @@ public class TimeSpacePoint {
     // Предвычисленные значения для мгновенного обращения из циклов расчетов
     private transient SweDate sweDate = new SweDate(); // дата для UTC в формате SweDate
     private ZonedDateTime zonedDateTime; // Точка во всемирной шкале времени
-    private double julianDayUT;          // Всемирное время (UT1) для домов/куспидов
+//    private double julianDayUT;          // Всемирное время (UT1) для домов/куспидов
 
     public LocalDateTime getLocalDateTime() {
         return localDateTime;
@@ -27,13 +27,10 @@ public class TimeSpacePoint {
         return sweDate;
     }
 
-    public ZonedDateTime getZonedDateTime() {
-        return zonedDateTime;
-    }
+//    public ZonedDateTime getZonedDateTime() {
+//        return zonedDateTime;
+//    }
 
-    public double getJulianDayUT() {
-        return julianDayUT;
-    }
 
     public double getJdUT() {
         return sweDate.getJulDay();
@@ -77,15 +74,14 @@ public class TimeSpacePoint {
 
         ZonedDateTime utc = this.zonedDateTime.withZoneSameInstant(ZoneId.of("UTC"));
 
-        double hourWithFraction = utc.getHour()
-                + (utc.getMinute() / 60.0)
-                + (utc.getSecond() / 3600.0);
-        sweDate.setDate(utc.getYear(),
+        double hourWithFraction = utc.getHour() + (utc.getMinute() / 60.0) + (utc.getSecond() / 3600.0);
+        sweDate.setDate(
+                utc.getYear(),
                 utc.getMonthValue(),
                 utc.getDayOfMonth(),
-                hourWithFraction);
-
-        this.julianDayUT = sweDate.getJulDay();
+                hourWithFraction
+        );
+//        this.julianDayUT = sweDate.getJulDay();
     }
 
     /**

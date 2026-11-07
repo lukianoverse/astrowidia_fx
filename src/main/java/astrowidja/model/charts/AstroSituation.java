@@ -13,7 +13,7 @@ import java.util.List;
         @JsonSubTypes.Type(value = DerivedSituation.class, name = "DERIVED"),
         @JsonSubTypes.Type(value = SpeculativeSituation.class, name = "MANUAL")
 })
-public abstract class AstralSituation {
+public abstract class AstroSituation {
     private String id;
     private String name;
     private List<Astra> astras = new ArrayList<>();

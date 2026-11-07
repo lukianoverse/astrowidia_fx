@@ -9,11 +9,11 @@ public class AstroWork {
     private String title;
     //    private CaseType type;
     // конкретные снимки неба
-    private List<AstralSituation> situations = new ArrayList<>();
+    private List<AstroSituation> situations = new ArrayList<>();
     // метаинформация
     private String comment;
     private List<String> tags = new ArrayList<>();
-    private List<String> linkedCasesIDs;
+    private List<String> linkedWorksIDs;
 
 
     public AstroWork() {
@@ -46,7 +46,7 @@ public class AstroWork {
         return tags;
     }
 
-    public List<AstralSituation> getSituations() {
+    public List<AstroSituation> getSituations() {
         return situations;
     }
 
@@ -55,8 +55,8 @@ public class AstroWork {
         return comment;
     }
 
-    public List<String> getLinkedCasesIDs() {
-        return linkedCasesIDs;
+    public List<String> getLinkedWorksIDs() {
+        return linkedWorksIDs;
     }
 
     public void setComment(String comment) {

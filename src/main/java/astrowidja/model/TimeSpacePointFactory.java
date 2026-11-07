@@ -1,7 +1,4 @@
-package astrowidja.provider;
-
-import astrowidja.model.Geolocation;
-import astrowidja.model.TimeSpacePoint;
+package astrowidja.model;
 
 import java.time.LocalDateTime;
 

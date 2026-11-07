@@ -1,6 +1,6 @@
 package astrowidja.model;
 
-import astrowidja.model.charts.AstralSituation;
+import astrowidja.model.charts.AstroSituation;
 
 import java.util.Map;
 
@@ -11,5 +11,5 @@ public interface DerivedChartCalculator {
      * @param args Словарь аргументов, необходимых для расчёта.
      * @return новую AstralSituation, вычисленную из полученных данных.
      */
-    AstralSituation calculate(AstralSituation[] baseCharts, Map<String, Object> args);
+    AstroSituation calculate(AstroSituation[] baseCharts, Map<String, Object> args);
 }

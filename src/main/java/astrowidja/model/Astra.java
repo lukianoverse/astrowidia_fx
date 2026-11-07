@@ -1,5 +1,6 @@
 package astrowidja.model;
 
+import astrowidja.model.charts.AstroSituation;
 import astrowidja.model.charts.Chart;
 import astrowidja.provider.SweCalcResult;
 import astrowidja.utils.CelestialMechanics;
@@ -7,7 +8,7 @@ import astrowidja.utils.CelestialMechanics;
 public class Astra implements ZodiacPoint {
 
     private String name;
-    private Chart heaven;
+    private AstroSituation heaven;
     private SweCalcResult ephemeris;    // или всё-таки ограничиться лишь долготой и ретроградностью?
     private AstroEntity entity;
 
@@ -24,7 +25,7 @@ public class Astra implements ZodiacPoint {
         return name;
     }
 
-    public Chart getHeaven() {
+    public AstroSituation getHeaven() {
         return heaven;
     }
 
@@ -32,7 +33,7 @@ public class Astra implements ZodiacPoint {
         return entity.getSymbol();
     }
 
-    public Astra(AstroEntity entity, Chart heaven, SweCalcResult ephemeris) {
+    public Astra(AstroEntity entity, AstroSituation heaven, SweCalcResult ephemeris) {
         name = entity.getName();
         this.heaven = heaven;
         this.ephemeris = ephemeris;
