@@ -1,4 +1,4 @@
-package astrowidja.model.charts;
+package astrowidja.model.storage;
 
 import astrowidja.model.Astra;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -17,7 +17,7 @@ import java.util.UUID;
         @JsonSubTypes.Type(value = SpeculativeSituation.class, name = "MANUAL")
 })
 public abstract class AstroSituation {
-    protected String id;
+    protected final String id;
     protected String name;
     protected final List<Astra> astras = new ArrayList<>();
 
@@ -34,9 +34,6 @@ public abstract class AstroSituation {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -57,6 +54,15 @@ public abstract class AstroSituation {
 
     public abstract SituationType getActualType();
 
-    public abstract String info();
+    public String info() {
+        StringBuilder sb = new StringBuilder("%s\n".formatted(name));
+        sb.append("%s\n".formatted(getDescription()));
+        for (Astra astra : astras)
+            sb.append("%s %s\n"
+                    .formatted(astra.getSymbol(), astra.getFormattedPosition()));
+        return sb.toString();
+    }
+
+    public abstract String getDescription();
 
 }

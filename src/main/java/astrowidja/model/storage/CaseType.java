@@ -1,4 +1,4 @@
-package astrowidja.model.charts;
+package astrowidja.model.storage;
 
 public enum CaseType {
     SINGLE, MULTI

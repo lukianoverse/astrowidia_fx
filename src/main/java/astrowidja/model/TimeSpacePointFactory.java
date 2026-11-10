@@ -1,6 +1,7 @@
 package astrowidja.model;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class TimeSpacePointFactory {
 
@@ -23,6 +24,13 @@ public class TimeSpacePointFactory {
                 locationName == null ? "<координаты>" : locationName, gmtZone
         );
         return new TimeSpacePoint(time, geo);
+    }
+
+    // Сценарий: текущее время, системный часовой пояс, координаты по умолчанию
+    public static TimeSpacePoint createForNow() {
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime now = LocalDateTime.now(zone);
+        return createGeocentric(now, zone.getId());
     }
 
     // Сценарий: время и город из базы локаций

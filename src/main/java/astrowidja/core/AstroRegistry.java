@@ -37,9 +37,8 @@ public class AstroRegistry {
     };
 
     public List<AstroEntity> getEntitiesToCalculate() {
-        ObservableList<String> astrasToCalculate = AppContext.getInstance()
-                .getCurrentSettings().getAstrasToCalculate();
-        return astrasToCalculate.stream()
+        return AppContext.getInstance()
+                .getCurrentSettings().getAstrasToCalculate().stream()
                 .map(this::findByName)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -57,7 +56,8 @@ public class AstroRegistry {
      * Находит сущность по имени, псевдониму или символу.
      */
     public Optional<AstroEntity> findByName(String name) {
-        if (name == null) return Optional.empty();
+        if (name == null || name.trim().isEmpty())
+            return Optional.empty();
         return registry.stream()
                 .filter(entity -> entity.matches(name.trim()))
                 .findFirst();

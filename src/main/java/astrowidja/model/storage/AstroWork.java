@@ -1,4 +1,4 @@
-package astrowidja.model.charts;
+package astrowidja.model.storage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ public class AstroWork {
     //    private CaseType type;
     // конкретные снимки неба
     private final List<AstroSituation> situations = new ArrayList<>();
+
     // метаинформация
     private String comment;
     private final List<String> tags = new ArrayList<>();
@@ -29,25 +30,6 @@ public class AstroWork {
         situations.add(situation);
     }
 
-    public void addTag(String tag) {
-        tags.add(tag);
-    }
-
-    public void addLinkedWork(String workId) {
-        linkedWorksIDs.add(workId);
-    }
-
-    public void removeLinkedWork(String workId) {
-        linkedWorksIDs.remove(workId);
-    }
-    public void removeTag(String tag) {
-        tags.remove(tag);
-    }
-
-    public void removeSituation(AstroSituation situation) {
-        situations.remove(situation);
-    }
-
     public boolean isSingle() {
         return situations.size() == 1;
     }
@@ -56,8 +38,27 @@ public class AstroWork {
         return situations.size() > 1;
     }
 
+    public void removeSituation(AstroSituation situation) {
+        situations.remove(situation);
+    }
+
     public String getId() {
         return id;
+    }
+    public void addTag(String tag) {
+        tags.add(tag);
+    }
+
+    public void removeTag(String tag) {
+        tags.remove(tag);
+    }
+
+    public void addLinkedWork(String workId) {
+        linkedWorksIDs.add(workId);
+    }
+
+    public void removeLinkedWork(String workId) {
+        linkedWorksIDs.remove(workId);
     }
 
     public String getTitle() {
@@ -77,12 +78,12 @@ public class AstroWork {
         return comment;
     }
 
-    public List<String> getLinkedWorksIDs() {
-        return linkedWorksIDs;
-    }
-
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public List<String> getLinkedWorksIDs() {
+        return linkedWorksIDs;
     }
 
     public void setTitle(String title) {
@@ -93,9 +94,7 @@ public class AstroWork {
         StringBuilder desc = new StringBuilder();
         desc.append(title).append("\n");
         for (AstroSituation situation : situations)
-            desc.append(situation.getName())
-                    .append(" (%s)\n".formatted(situation.getActualType()))
-                    .append(situation.info()).append("\n");
+            desc.append(situation.info()).append("\n");
         return desc.toString();
     }
 }

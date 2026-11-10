@@ -2,13 +2,11 @@ package astrowidja.fx;
 
 import astrowidja.core.AstroRegistry;
 import astrowidja.core.Settings;
-import astrowidja.model.charts.AstroSituation;
-import astrowidja.model.charts.AstroWork;
-import astrowidja.model.charts.NaturalSituation;
+import astrowidja.model.storage.AstroWork;
+import astrowidja.model.storage.AstroWorkFactory;
 import astrowidja.provider.AstroDataProvider;
 import astrowidja.model.TimeSpacePoint;
 import astrowidja.model.TimeSpacePointFactory;
-import astrowidja.provider.SituationCalcResult;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -51,6 +49,10 @@ public class WorkController {
         initDatePicker();
         initTimeSpinners();
         initTimezoneSelector();
+
+        AstroWork work = AstroWorkFactory.createForNow();
+        appContext.setActiveChart(work);
+        resultTextArea.setText(work.info());
     }
 
     private void initDatePicker() {
@@ -98,23 +100,7 @@ public class WorkController {
                 LocalDateTime.of(selectedDate, localTime), zoneId.getId()
         );
 
-        AstroWork work = new AstroWork("Карта");
-        AstroSituation situation = new NaturalSituation();
-        SituationCalcResult calculated = astroEngine.calculateSituation(
-                moment,
-                currentSettings.getCurrentModus(),
-                registry.getEntitiesToCalculate(),
-                situation
-        );
-        situation.addAstras(calculated.astras());
-        if (calculated.hasWarning()) {
-            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
-            infoAlert.setTitle("Примечания к расчету");
-            infoAlert.setHeaderText("Некоторые астросущности рассчитаны в резервном режиме:");
-            infoAlert.setContentText(calculated.report());
-            infoAlert.show();
-        }
-        work.addSituation(situation);
+        AstroWork work = AstroWorkFactory.createForDate(moment);
 
         appContext.setActiveChart(work);
 

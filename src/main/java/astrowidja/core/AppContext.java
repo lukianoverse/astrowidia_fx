@@ -1,6 +1,6 @@
 package astrowidja.core;
 
-import astrowidja.model.charts.AstroWork;
+import astrowidja.model.storage.AstroWork;
 import astrowidja.provider.AstroDataProvider;
 import astrowidja.provider.AyanamshaMode;
 import astrowidja.provider.CalcMethod;
@@ -65,7 +65,7 @@ public class AppContext {
         Path epheFolder = rootDir.resolve("ephe");
 
         // Создадим папку для списков AWD, если её ещё нет,
-        // чтобы AWDFileChartRepository не ругался при старте
+        // чтобы если чо репозиторий не ругался при старте
         if (!Files.exists(awdataFolder)) {
             try {
                 Files.createDirectories(awdataFolder);
@@ -93,6 +93,7 @@ public class AppContext {
             // Если файла нет, прога работает на дефолтах, создадим файл при выходе
             return;
         }
+
         try (InputStream is = Files.newInputStream(settingsFilePath);
              InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             Properties props = new Properties();
@@ -100,24 +101,66 @@ public class AppContext {
 
             // Читаем значения из файла, если строки кривые — сработает дефолт
             if (props.containsKey("calcMethod"))
-                currentSettings.setCalcMethod(CalcMethod.valueOf(props.getProperty("calcMethod")));
+                try {
+                    currentSettings.setCalcMethod(CalcMethod.valueOf(props.getProperty("calcMethod")));
+                } catch (Exception e) {
+                    System.err.println("[Настройки] Ошибка чтения calcMethod, оставлен дефолт: " + e.getMessage());
+                }
+
             if (props.containsKey("referencePoint"))
-                currentSettings.setReferencePoint(ReferencePoint.valueOf(props.getProperty("referencePoint")));
+                try {
+                    currentSettings.setReferencePoint(ReferencePoint.valueOf(props.getProperty("referencePoint")));
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException(e);
+                }
+
             if (props.containsKey("ayanamsha"))
-                currentSettings.setAyanamsha(AyanamshaMode.valueOf(props.getProperty("ayanamsha")));
+                try {
+                    currentSettings.setAyanamsha(AyanamshaMode.valueOf(props.getProperty("ayanamsha")));
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException(e);
+                }
+
             if (props.containsKey("projectionPlane"))
-                currentSettings.setProjectionPlane(ProjectionPlane.valueOf(props.getProperty("projectionPlane")));
+                try {
+                    currentSettings.setProjectionPlane(ProjectionPlane.valueOf(props.getProperty("projectionPlane")));
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException(e);
+                }
+
             if (props.containsKey("userAyanamshaOffset"))
-                currentSettings.setUserAyanamshaOffset(Double.parseDouble(props.getProperty("userAyanamshaOffset")));
+                try {
+                    currentSettings.setUserAyanamshaOffset(Double.parseDouble(props.getProperty("userAyanamshaOffset")));
+                } catch (NumberFormatException e) {
+                    System.err.println("[Настройки] Ошибка парсинга числа userAyanamshaOffset (неверный формат): " + e.getMessage());
+                }
+
+
             if (props.containsKey("nodeType"))
-                currentSettings.setNodeType(NodeType.valueOf(props.getProperty("nodeType")));
+                try {
+                    currentSettings.setNodeType(NodeType.valueOf(props.getProperty("nodeType")));
+                } catch (Exception e) {
+                    System.err.println("[Настройки] Ошибка чтения nodeType, оставлен дефолт: " + e.getMessage());
+                }
+
             if (props.containsKey("lilithType"))
-                currentSettings.setLilithType(LilithType.valueOf(props.getProperty("lilithType")));
+                try {
+                    currentSettings.setLilithType(LilithType.valueOf(props.getProperty("lilithType")));
+                } catch (Exception e) {
+                    System.err.println("[Настройки] Ошибка чтения lilithType, оставлен дефолт: " + e.getMessage());
+                }
+
+
+            // Загрузка активных астр
             if (props.containsKey("activeAstras")) {
-                String[] names = props.getProperty("activeAstras").split(",");
-                currentSettings.getAstrasToCalculate().setAll(names);
+                try {
+                    String[] names = props.getProperty("activeAstras").split(",");
+                    currentSettings.getAstrasToCalculate().setAll(names);
+                } catch (Exception e) {
+                    System.err.println("[Настройки] Ошибка разбора списка activeAstras: " + e.getMessage());
+                }
             } else {
-                // Выбранные по умолчанию астры
+                // Набор по умолчанию
                 currentSettings.getAstrasToCalculate()
                         .setAll("Солнце", "Луна", "Меркурий", "Венера", "Марс",
                                 "Юпитер", "Сатурн", "Уран", "Нептун");

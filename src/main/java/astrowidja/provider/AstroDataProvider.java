@@ -4,7 +4,7 @@ import astrowidja.model.Astra;
 import astrowidja.model.AstroEntity;
 import astrowidja.model.Geolocation;
 import astrowidja.model.TimeSpacePoint;
-import astrowidja.model.charts.AstroSituation;
+import astrowidja.model.storage.AstroSituation;
 import swisseph.SwissEph;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class AstroDataProvider {
     public SweCalcResult getPlanetEphemeris(TimeSpacePoint tsp, ModusCalculationis modus, int planetId) {
         // Проверка диапазона приемлемых дат
         int year = tsp.getYear();
-        // TODO: поместить эту проверку в контроллер (?) и поставить в зависимость от текущего способа расчёта
+        // TODO: поместить эту проверку в контроллер (?)
         if (modus.getCalcMethod() == CalcMethod.MOSHIER
                 && (year < -1349 || year > 3000))
             throw new IllegalArgumentException(
@@ -64,7 +64,6 @@ public class AstroDataProvider {
         StringBuffer serr = new StringBuffer(); // сюда сишный метод запишет ошибку или замечание
 
         int status = epheMachine.swe_calc_ut(tsp.getJdUT(), planetId, modus.getSwissEphFlags(), xp, serr);
-        // TODO: вздымать окошко с уведомлением, если статус не равен 0
 
         return new SweCalcResult(status, xp, serr.toString());
     }

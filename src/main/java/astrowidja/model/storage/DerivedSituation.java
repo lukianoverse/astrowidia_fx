@@ -1,4 +1,4 @@
-package astrowidja.model.charts;
+package astrowidja.model.storage;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +26,11 @@ public class DerivedSituation extends AstroSituation {
 
     @Override
     public String info() {
+        return "";
+    }
+
+    @Override
+    public String getDescription() {
         return "";
     }
 

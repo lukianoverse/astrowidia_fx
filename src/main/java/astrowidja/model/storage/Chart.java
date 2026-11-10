@@ -1,4 +1,4 @@
-package astrowidja.model.charts;
+package astrowidja.model.storage;
 
 import astrowidja.model.Astra;
 import astrowidja.model.AstroEntity;
