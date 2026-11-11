@@ -1,11 +1,16 @@
 package astrowidja.provider;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import static astrowidja.provider.AyanamshaMode.*;
 import static astrowidja.provider.CalcMethod.*;
 import static astrowidja.provider.ProjectionPlane.*;
 import static astrowidja.provider.ReferencePoint.*;
 import static swisseph.SweConst.*;
 
+@JsonSerialize(using = ModusCalculationisSerializer.class)
+@JsonDeserialize(using = ModusCalculationisDeserializer.class)
 public class ModusCalculationis {
     private CalcMethod calcMethod = MOSHIER;
     private ReferencePoint referencePoint = GEOCENTRIC;
@@ -53,6 +58,23 @@ public class ModusCalculationis {
         }
 
         return flags;
+    }
+
+    // --- Упаковка в 1 байт при записи в файл ---
+    public int getAWBitmask() {
+        int mask = 0;
+        mask |= calcMethod.ordinal();          // бит 0
+        mask |= (referencePoint.ordinal() << 1); // биты 1-2
+        mask |= (ayanamsha.ordinal() << 3);     // биты 3-5
+        mask |= (projectionPlane.ordinal() << 6); // биты 6-7
+        return mask;
+    }
+
+    public void setFromAWBitmask(int mask) {
+        this.calcMethod = CalcMethod.values()[mask & 1];
+        this.referencePoint = ReferencePoint.values()[(mask >> 1) & 3];
+        this.ayanamsha = AyanamshaMode.values()[(mask >> 3) & 7];
+        this.projectionPlane = ProjectionPlane.values()[(mask >> 6) & 3];
     }
 
     public CalcMethod getCalcMethod() {

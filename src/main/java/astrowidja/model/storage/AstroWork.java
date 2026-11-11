@@ -1,5 +1,8 @@
 package astrowidja.model.storage;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +23,16 @@ public class AstroWork {
     public AstroWork() {
         this.id = UUID.randomUUID().toString();
     }
+    // Говорим Церере использовать этот конструктор при восстановлении
+    @JsonCreator
+    public AstroWork(
+            @JsonProperty("id") String id,
+            @JsonProperty("title") String title
+    ) {
+        this.id = id;
+        this.title = title;
+    }
+
 
     public AstroWork(String title) {
         this();

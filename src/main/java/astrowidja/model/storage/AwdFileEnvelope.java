@@ -6,12 +6,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-// Венера требует порядка: заставляем Jackson писать поля в последовательности,
 // чтобы заголовок версии формата был в первой строчке
 @JsonPropertyOrder({ "awdVersion", "listName", "listComment", "modified", "works" })
 public class AwdFileEnvelope {
     private final int awdVersion = 1;
-    private String listName;       // Название списка (отображается в JavaFX)
+    private String listName;       // Название списка
     private String listComment;    // Описание списка
     private long modified;         // Метка времени последнего изменения
     private final List<AstroWork> works = new ArrayList<>();
@@ -25,7 +24,7 @@ public class AwdFileEnvelope {
         setUpdated();
     }
 
-    // Автоматическое обновление метки времени
+    // ставится текущее время
     public void setUpdated() {
         this.modified = System.currentTimeMillis();
     }
