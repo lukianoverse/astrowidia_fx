@@ -78,19 +78,17 @@ public class AstroDataProvider {
         setEngineMode(tsp, modus);
 
         List<Astra> astras = new ArrayList<>();
-        StringBuilder report = new StringBuilder();
 
         for (AstroEntity entity : entities) {
             // Машина использует состояние, инициализированное выше
             SweCalcResult result = getPlanetEphemeris(tsp, modus, entity.getSwissId());
-            // TODO: бросить исключение, если !result.isCompleted() ?
-            if (!result.isSuccess())
-                report.append("%s: %s%n"
-                        .formatted(entity.getName(), result.getMessage()));
             astras.add(new Astra(entity, situationContext, result));
         }
 
-        return new SituationCalcResult(astras, report.toString());
+        CalculationReport report = AstraBatchReporter.build(modus.getSwissEphFlags(), astras);
+        // TODO: бросить исключение, если !report.hasErrors() ?
+
+        return new SituationCalcResult(astras, report);
     }
 
     private void setEngineMode(TimeSpacePoint tsp, ModusCalculationis modus) {

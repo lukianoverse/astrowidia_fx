@@ -30,7 +30,8 @@ public class NaturalSituation extends AstroSituation {
 
     @Override
     public String getDescription() {
-        return "Небо на " + timeSpacePoint.getZonedDateTime() + " в " + timeSpacePoint.getGeolocation();
+        return "Небо на " + timeSpacePoint.getLocalDateTime()
+                + " в " + timeSpacePoint.getGeolocation().toMeaningfullString();
     }
 
 }

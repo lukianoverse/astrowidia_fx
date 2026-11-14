@@ -1,6 +1,7 @@
 package astrowidja.model.storage;
 
 import astrowidja.model.Astra;
+import astrowidja.utils.IdGenerator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -22,7 +23,7 @@ public abstract class AstroSituation {
     protected final List<Astra> astras = new ArrayList<>();
 
     public AstroSituation() {
-        this.id = UUID.randomUUID().toString();
+        this.id = IdGenerator.generate("sit");
     }
 
     public AstroSituation(String name) {
@@ -56,6 +57,7 @@ public abstract class AstroSituation {
 
     public String info() {
         StringBuilder sb = new StringBuilder("%s\n".formatted(name));
+        sb.append("%s\n".formatted(id));
         sb.append("%s\n".formatted(getDescription()));
         for (Astra astra : astras)
             sb.append("%s %s\n"

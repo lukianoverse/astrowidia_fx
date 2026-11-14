@@ -8,7 +8,16 @@ public class Astra implements ZodiacPoint {
 
     private String name;
     private final AstroSituation heaven;
-    private SweCalcResult ephemeris;    // или всё-таки ограничиться лишь долготой и ретроградностью?
+    private SweCalcResult ephemeris;
+
+    public SweCalcResult getEphemeris() {
+        return ephemeris;
+    }
+
+    public AstroEntity getEntity() {
+        return entity;
+    }
+
     private final AstroEntity entity;
 
     @Override
@@ -101,7 +110,7 @@ public class Astra implements ZodiacPoint {
 
     public String getFormattedPosition() {
         int[] coor = CelestialMechanics.degreesToSignAndCoors(getZodiacPosition());
-        return "%s%s\t\t%c %2d°%2d'%2d\"".formatted(
+        return "%s%s\t\t%c %2d°%2d′%2d″".formatted(
                 getSymbol(),
                 isRetrograde() ? "R " : "  ",
                 ZodiacSign.values()[coor[0] - 1].symbol,

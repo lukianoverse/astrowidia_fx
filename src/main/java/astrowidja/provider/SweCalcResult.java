@@ -1,7 +1,7 @@
 package astrowidja.provider;
 
 public record SweCalcResult(
-        int status, // -1 для ошибки, 0 для успеха, 1 и т.д. для предупреждений
+        int status, // битовая маска, по которой фактически выполнился расчёт (-1 для неуспеха)
         double longitude,   // долгота (здесь и далее: в выбранной системе координат)
         double latitude,    // широта
         double distance,    // расстояние до тела
@@ -19,16 +19,11 @@ public record SweCalcResult(
     }
 
     public boolean isSuccess() {
-        return status == 0;
-    }
-
-    public boolean isCompleted() {
         return status > -1;
     }
 
     public String getMessage() {
-        return "Функция swe_calc_ut завершилась со статусом %d: %s"
-                .formatted(status, serr);
+        return serr;
     }
 
 }

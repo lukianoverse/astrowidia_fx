@@ -6,9 +6,12 @@ import java.util.List;
 
 public record SituationCalcResult(
         List<Astra> astras,
-        String report
+        CalculationReport report
 ) {
+    public boolean hasError() {
+        return report != null && report.hasErrors();
+    }
     public boolean hasWarning() {
-        return report != null && !report.trim().isBlank();
+        return report != null && report.hasWarnings();
     }
 }

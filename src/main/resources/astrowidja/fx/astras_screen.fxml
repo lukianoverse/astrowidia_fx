@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="astrowidja.fx.AstrasController"
+            fx:controller="astrowidja.fx.screens.AstrasController"
             fitToHeight="true" vbarPolicy="NEVER"
             style="-fx-background-color: #212121; -fx-background: #212121;">
 

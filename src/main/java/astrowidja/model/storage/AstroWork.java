@@ -1,5 +1,6 @@
 package astrowidja.model.storage;
 
+import astrowidja.utils.IdGenerator;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,7 +22,7 @@ public class AstroWork {
 
 
     public AstroWork() {
-        this.id = UUID.randomUUID().toString();
+        this.id = IdGenerator.generate("wrk");
     }
     // Говорим Церере использовать этот конструктор при восстановлении
     @JsonCreator
@@ -106,6 +107,7 @@ public class AstroWork {
     public String info() {
         StringBuilder desc = new StringBuilder();
         desc.append(title).append("\n");
+        desc.append(id).append("\n");
         for (AstroSituation situation : situations)
             desc.append(situation.info()).append("\n");
         return desc.toString();

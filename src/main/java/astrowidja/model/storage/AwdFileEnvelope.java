@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Конверт для AWD-файла библиотеки карт астролога.
+ */
 // чтобы заголовок версии формата был в первой строчке
 @JsonPropertyOrder({ "awdVersion", "listName", "listComment", "modified", "works" })
 public class AwdFileEnvelope {

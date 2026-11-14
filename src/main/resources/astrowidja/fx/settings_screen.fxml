@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="astrowidja.fx.SettingsController"
+      fx:controller="astrowidja.fx.screens.SettingsController"
       spacing="20.0" style="-fx-background-color: #1e1e1e; -fx-text-fill: white;">
 
     <padding>

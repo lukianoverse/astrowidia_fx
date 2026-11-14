@@ -1,9 +1,11 @@
-package astrowidja.fx;
+package astrowidja.fx.screens;
 
 import astrowidja.core.AstroRegistry;
+import astrowidja.core.NotificationService;
 import astrowidja.core.Settings;
 import astrowidja.model.storage.AstroWork;
 import astrowidja.model.storage.AstroWorkFactory;
+import astrowidja.model.storage.WorkCreationOutcome;
 import astrowidja.provider.AstroDataProvider;
 import astrowidja.model.TimeSpacePoint;
 import astrowidja.model.TimeSpacePointFactory;
@@ -50,9 +52,24 @@ public class WorkController {
         initTimeSpinners();
         initTimezoneSelector();
 
-        AstroWork work = AstroWorkFactory.createForNow();
-        appContext.setActiveChart(work);
-        resultTextArea.setText(work.info());
+        createChartForNow();
+        NotificationService.showInfo("Привет! Так выглядят уведомления");
+    }
+
+    private void createChartForNow() {
+        try {
+            WorkCreationOutcome outcome = AstroWorkFactory.createForNow();
+            AstroWork work = outcome.work();
+            appContext.setActiveChart(work);
+            // Если замечания — мягко всплываем снизу
+            if (outcome.hasWarnings())
+                NotificationService.showInfo(outcome.warnings());
+
+            resultTextArea.setText(appContext.getActiveChart().info());
+        } catch (Exception e) {
+            // Если создание прервалось из-за ошибки — показываем алёрт
+            NotificationService.showError("Не удалось построить карту", e.getMessage());
+        }
     }
 
     private void initDatePicker() {

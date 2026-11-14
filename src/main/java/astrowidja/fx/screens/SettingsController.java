@@ -1,4 +1,4 @@
-package astrowidja.fx;
+package astrowidja.fx.screens;
 
 import astrowidja.core.AppContext;
 import astrowidja.core.Settings;

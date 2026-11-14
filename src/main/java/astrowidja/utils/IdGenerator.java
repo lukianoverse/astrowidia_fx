@@ -8,12 +8,12 @@ public class IdGenerator {
     private static final int MACHINE_ID = calculateMachineId();
     private static final Random RANDOM = new Random();
 
-    // Набор букв для соли
+    // Набор прикольных буквенно-цифровых символов для соли
     private static final String ALPHABET = "abcdefghijklmopqrstuvwxyz2345678";
 
 
     public static String generate(String prefix) {
-        // 1. Считаем секунды от нашей личной эпохи
+        // 1. Считаем секунды от нашей эпохи
         long currentSeconds = System.currentTimeMillis() / 1000;
         long astroSeconds = Math.max(0, currentSeconds - AW_EPOCH_SECONDS); // для красоты
 
@@ -36,7 +36,7 @@ public class IdGenerator {
                 System.getProperty("user.name", "astrolog"),
                 System.getProperty("os.name", "systema"),
                 System.getProperty("os.arch", "technika"),
-                // Проверяем имя компьютера для Windows, если null — пробуем для Linux, если null — пишем "pc"
+                // Проверяем имя компьютера для Windows, если null — пробуем для Linux, если null — пишем "хуй"
                 System.getenv("COMPUTERNAME") != null ? System.getenv("COMPUTERNAME") :
                         (System.getenv("HOSTNAME") != null ? System.getenv("HOSTNAME") : "sex")
         );
