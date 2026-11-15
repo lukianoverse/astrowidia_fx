@@ -24,12 +24,11 @@ public class AstroWork {
     public AstroWork() {
         this.id = IdGenerator.generate("wrk");
     }
+
     // Говорим Церере использовать этот конструктор при восстановлении
     @JsonCreator
-    public AstroWork(
-            @JsonProperty("id") String id,
-            @JsonProperty("title") String title
-    ) {
+    public AstroWork(@JsonProperty("id") String id,
+                     @JsonProperty("title") String title) {
         this.id = id;
         this.title = title;
     }

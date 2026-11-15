@@ -39,6 +39,8 @@ public class AppContext {
 
     private final Settings currentSettings = new Settings();
     private Path settingsFilePath;
+
+
     /**
      * Карта, активная в данный момент. То есть отображаемая и доступная для расчётов.
      */

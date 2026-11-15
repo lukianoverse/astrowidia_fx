@@ -1,5 +1,6 @@
 package astrowidja.fx;
 
+import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,6 +14,9 @@ import javafx.util.Duration;
 public class BottomToastBanner extends HBox {
 
     private final Label textLabel = new Label();
+    // Таймер автоскрытия (например, 7 секунд)
+    private final PauseTransition autoHideTimer = new PauseTransition(Duration.seconds(7));
+
 
     public BottomToastBanner() {
         this.setAlignment(Pos.CENTER_LEFT);
@@ -21,7 +25,7 @@ public class BottomToastBanner extends HBox {
         this.setMaxHeight(USE_PREF_SIZE);
         this.setMaxWidth(650); // Чтобы не растягивалась на весь монитор
         
-        // Стиль аккуратной плавающей карточки снизу
+        // Стиль плавающей карточки снизу
         this.setStyle(
             "-fx-background-color: #2b2d30;" +
             "-fx-text-fill: #f0f0f0;" +
@@ -43,24 +47,34 @@ public class BottomToastBanner extends HBox {
         StackPane.setMargin(this, new Insets(0, 20, 20, 20));
         
         this.setVisible(false);
+
+        // Настраиваем логику автоскрытия
+        autoHideTimer.setOnFinished(e -> hideToast());
+
+        // Пока мышка наведена на плашку — не прячем её!
+        this.setOnMouseEntered(e -> autoHideTimer.pause());
+        this.setOnMouseExited(e -> autoHideTimer.play());
     }
 
-    public void showToast(String warnings) {
-        if (warnings == null || warnings.isBlank()) {
+    public void showToast(String notification) {
+        if (notification == null || notification.isBlank()) {
             this.setVisible(false);
             return;
         }
-        textLabel.setText(warnings);
+        autoHideTimer.stop(); // Сбрасываем старый таймер, если прилетело новое уведомление
+        textLabel.setText(notification);
         this.setVisible(true);
         
         // Выезжаем снизу вверх
         this.setTranslateY(60);
         TranslateTransition slideUp = new TranslateTransition(Duration.millis(250), this);
         slideUp.setToY(0);
+        slideUp.setOnFinished(e -> autoHideTimer.playFromStart()); // Запускаем отсчёт после выезда
         slideUp.play();
     }
 
     public void hideToast() {
+        autoHideTimer.stop();
         TranslateTransition slideDown = new TranslateTransition(Duration.millis(200), this);
         slideDown.setToY(60);
         slideDown.setOnFinished(e -> this.setVisible(false));

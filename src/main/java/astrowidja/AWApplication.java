@@ -14,7 +14,8 @@ import java.io.IOException;
 public class AWApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(AWApplication.class.getResource("fx/main_frame.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(AWApplication.class
+                .getResource("fx/main_frame.fxml"));
         Parent root = fxmlLoader.load();
         MainFrame mainFrame = fxmlLoader.getController();
         Scene scene = new Scene(root);

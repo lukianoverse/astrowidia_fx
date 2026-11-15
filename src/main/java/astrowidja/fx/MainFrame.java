@@ -1,5 +1,6 @@
 package astrowidja.fx;
 
+import astrowidja.core.NotificationService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -7,10 +8,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import java.io.IOException;
 
 public class MainFrame {
+
+    public HBox topMenu;
 
     @FXML
     private StackPane mainStackPane;
@@ -21,15 +25,19 @@ public class MainFrame {
     @FXML private Button btnAstras;
     @FXML private Button btnSettings;
 
+
     // экраны
     private Parent workScreen;
     private Parent libraryScreen;
     private Parent astrasScreen;
     private Parent settingsScreen;
+    BottomToastBanner toastBanner = new BottomToastBanner();
 
     @FXML
     public void initialize() {
         try {
+            NotificationService.registerBanner(toastBanner);
+
             // Загружаем все 4 экрана в память единожды
             workScreen = loadScreen("work_screen.fxml");
             libraryScreen = loadScreen("library_screen.fxml");
@@ -37,7 +45,8 @@ public class MainFrame {
             settingsScreen = loadScreen("settings_screen.fxml");
 
             // Складываем их друг на друга в StackPane
-            mainStackPane.getChildren().addAll(workScreen, libraryScreen, astrasScreen, settingsScreen);
+            mainStackPane.getChildren()
+                    .addAll(workScreen, libraryScreen, astrasScreen, settingsScreen, toastBanner);
 
             // По умолчанию кажем главный экран расчёта
             showScreen(workScreen, btnWork);
@@ -52,7 +61,7 @@ public class MainFrame {
         return loader.load();
     }
 
-    // Обработчик мыши: кликнули на кнопку -> переключили экран
+    // Обработчик переключения экранов мышью
     @FXML
     private void onMenuButtonClick(ActionEvent event) {
         Button clickedButton = (Button) event.getSource();
@@ -71,6 +80,7 @@ public class MainFrame {
         settingsScreen.setVisible(targetScreen == settingsScreen);
 
         targetScreen.toFront();
+        toastBanner.toFront(); // Гарантируем, что баннер всегда остаётся самым верхним слоем
 
         // Меняем стили кнопок в зависимости от активной
         updateButtonStyles(activeButton);
