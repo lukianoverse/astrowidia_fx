@@ -13,6 +13,9 @@ public class NaturalSituation extends AstroSituation {
         this.modusCalculationis = modusCalculationis;
     }
 
+    public NaturalSituation() {
+    }
+
     @Override
     public SituationType getActualType() {
         return SituationType.NATURAL;
@@ -33,5 +36,22 @@ public class NaturalSituation extends AstroSituation {
         return "Небо на " + timeSpacePoint.getLocalDateTime()
                 + " в " + timeSpacePoint.getGeolocation().toMeaningfullString();
     }
+
+    public TimeSpacePoint getTimeSpacePoint() {
+        return timeSpacePoint;
+    }
+
+    public void setTimeSpacePoint(TimeSpacePoint tsp) {
+        this.timeSpacePoint = tsp;
+    }
+
+    public ModusCalculationis getModusCalculationis() {
+        return modusCalculationis;
+    }
+
+    public void setModusCalculationis(ModusCalculationis modus) {
+        this.modusCalculationis = modus;
+    }
+
 
 }

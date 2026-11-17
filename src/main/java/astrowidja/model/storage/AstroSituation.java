@@ -2,12 +2,12 @@ package astrowidja.model.storage;
 
 import astrowidja.model.Astra;
 import astrowidja.utils.IdGenerator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -20,10 +20,11 @@ import java.util.UUID;
 public abstract class AstroSituation {
     protected final String id;
     protected String name;
+    @JsonIgnore // пока что
     protected final List<Astra> astras = new ArrayList<>();
 
     public AstroSituation() {
-        this.id = IdGenerator.generate("sit");
+        this.id = IdGenerator.generate("nas");
     }
 
     public AstroSituation(String name) {

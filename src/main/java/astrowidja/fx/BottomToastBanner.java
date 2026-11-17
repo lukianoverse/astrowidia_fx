@@ -23,8 +23,9 @@ public class BottomToastBanner extends HBox {
         this.setPadding(new Insets(10, 16, 10, 16));
         this.setSpacing(12);
         this.setMaxHeight(USE_PREF_SIZE);
-        this.setMaxWidth(650); // Чтобы не растягивалась на весь монитор
-        
+        this.setMaxWidth(USE_PREF_SIZE); // Сжиматься ровно по ширине содержимого
+        textLabel.setMaxWidth(580);      // Длинный текст переноситься на новую черзе 580px
+
         // Стиль плавающей карточки снизу
         this.setStyle(
             "-fx-background-color: #2b2d30;" +
@@ -43,7 +44,7 @@ public class BottomToastBanner extends HBox {
         this.getChildren().addAll(textLabel, closeBtn);
         
         // Прижимаем к низу StackPane с отступом
-        StackPane.setAlignment(this, Pos.BOTTOM_CENTER);
+        StackPane.setAlignment(this, Pos.BOTTOM_RIGHT);
         StackPane.setMargin(this, new Insets(0, 20, 20, 20));
         
         this.setVisible(false);

@@ -80,7 +80,8 @@ public class MainFrame {
         settingsScreen.setVisible(targetScreen == settingsScreen);
 
         targetScreen.toFront();
-        toastBanner.toFront(); // Гарантируем, что баннер всегда остаётся самым верхним слоем
+        if (toastBanner != null)
+            toastBanner.toFront(); // Гарантируем, что баннер остаётся сверху
 
         // Меняем стили кнопок в зависимости от активной
         updateButtonStyles(activeButton);

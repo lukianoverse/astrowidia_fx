@@ -1,8 +1,12 @@
 package astrowidja.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import swisseph.SweDate;
 
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 
 public class TimeSpacePoint {
@@ -14,6 +18,14 @@ public class TimeSpacePoint {
     private ZonedDateTime zonedDateTime; // Точка во всемирной шкале времени
 //    private double julianDayUT;          // Всемирное время (UT1) для домов/куспидов
 
+
+    // Говорим Церере (Jackson): "Используй этот конструктор при восстановлении из JSON!"
+    @JsonCreator
+    public TimeSpacePoint(
+            @JsonProperty("dateTime") LocalDateTime dateTime,
+            @JsonProperty("geolocation") Geolocation geolocation) {
+        updateAll(dateTime, geolocation);
+    }
     public LocalDateTime getLocalDateTime() {
         return localDateTime;
     }
@@ -50,9 +62,7 @@ public class TimeSpacePoint {
         return !Double.isNaN(geolocation.latitude())
                 && !Double.isNaN(geolocation.longitude());
     }
-    public TimeSpacePoint(LocalDateTime localDateTime, Geolocation geolocation) {
-        updateAll(localDateTime, geolocation);
-    }
+
 
     public void updateAll(LocalDateTime localDateTime, Geolocation geolocation) {
         this.localDateTime = localDateTime;
