@@ -13,7 +13,7 @@ import java.util.List;
  */
 // Венера сохраняет порядок полей при сериализации в файл
 @JsonPropertyOrder({"awdVersion", "id", "title", "comment", "modified", "works"})
-public class WorkList {
+public class Album   {
     // Текущая версия программы — константа класса
     public static final int CURRENT_AWD_VERSION = 1;
 
@@ -25,7 +25,7 @@ public class WorkList {
     private final List<AstroWork> works = new ArrayList<>();
 
     // 1. Конструктор для создания НОВОГО списка в программе
-    public WorkList(String title) {
+    public Album(String title) {
         this.awdVersion = CURRENT_AWD_VERSION; // Зашиваем актуальную версию
         this.id = IdGenerator.generate("lst");
         setTitle(title); // Используем валидацию сеттера
@@ -34,7 +34,7 @@ public class WorkList {
 
     // 2. Конструктор для Цереры (Jackson): принимает ТОЛЬКО final-поля!
     @JsonCreator
-    public WorkList(
+    public Album(
             @JsonProperty("awdVersion") int awdVersion,
             @JsonProperty("id") String id) {
         this.awdVersion = awdVersion;

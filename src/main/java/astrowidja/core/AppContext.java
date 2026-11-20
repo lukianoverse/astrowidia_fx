@@ -1,28 +1,25 @@
 package astrowidja.core;
 
-import astrowidja.model.storage.AstroWork;
-import astrowidja.provider.AstroDataProvider;
-import astrowidja.provider.AyanamshaMode;
-import astrowidja.provider.CalcMethod;
-import astrowidja.provider.ProjectionPlane;
-import astrowidja.provider.ReferencePoint;
 import astrowidja.model.LilithType;
 import astrowidja.model.NodeType;
+import astrowidja.model.storage.Album;
+import astrowidja.model.storage.AstroWork;
+import astrowidja.provider.*;
+import astrowidja.service.UserLibrary;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
-import static astrowidja.provider.CalcMethod.*;
+import static astrowidja.provider.CalcMethod.MOSHIER;
+import static astrowidja.provider.CalcMethod.SWISSEPH;
 
 public class AppContext {
     private static AppContext instance;
@@ -38,6 +35,7 @@ public class AppContext {
     //  управления списками пользователя
 
     private final Settings currentSettings = new Settings();
+    private final UserLibrary userLibrary = new UserLibrary();
     private Path settingsFilePath;
 
 
@@ -46,13 +44,18 @@ public class AppContext {
      */
     private AstroWork activeChart = null;
 
+
+    private final ObjectProperty<AstroWork> activeWork = new SimpleObjectProperty<>();
+    private final ObjectProperty<Album> activeAlbum = new SimpleObjectProperty<>();
+
+
     private AppContext() {
         initSettingsPath();
         loadSettings();
     }
 
-    // TODO: добавить в настройки пути к базе данных и к эфемеридам
 
+    // TODO: добавить в настройки пути к базе данных и к эфемеридам
     private void initSettingsPath() {
         // строго локально в папке запуска программы
         Path rootDir = Paths.get(".");
@@ -154,18 +157,23 @@ public class AppContext {
 
 
             // Загрузка активных астр
+            var astras = currentSettings.getAstrasToCalculate();
+            astras.clear();
+
             if (props.containsKey("activeAstras")) {
                 try {
-                    String[] names = props.getProperty("activeAstras").split(",");
-                    currentSettings.getAstrasToCalculate().setAll(names);
+                    for (String raw : props.getProperty("activeAstras").split(",")) {
+                        String name = raw.trim();
+                        if (!name.isEmpty()) astras.add(name);
+                    }
                 } catch (Exception e) {
                     System.err.println("[Настройки] Ошибка разбора списка activeAstras: " + e.getMessage());
                 }
             } else {
                 // Набор по умолчанию
-                currentSettings.getAstrasToCalculate()
-                        .setAll("Солнце", "Луна", "Меркурий", "Венера", "Марс",
-                                "Юпитер", "Сатурн", "Уран", "Нептун");
+                astras.addAll(List.of(
+                        "Солнце", "Луна", "Меркурий", "Венера", "Марс",
+                        "Юпитер", "Сатурн", "Уран", "Нептун"));
             }
         } catch (Exception e) {
             // TODO: заменить на уведомление
@@ -235,6 +243,22 @@ public class AppContext {
     }
 
 
+    public Album getActiveAlbum() {
+        return activeAlbum.get();
+    }
+
+    public void setActiveAlbum(Album album) {
+        this.activeAlbum.set(album);
+    }
+
+    public AstroWork getActiveWork() {
+        return activeWork.get();
+    }
+
+    public void setActiveWork(AstroWork work) {
+        this.activeWork.set(work);
+    }
+
     public AstroRegistry getAstroRegistry() {
         return astroRegistry;
     }
@@ -247,5 +271,17 @@ public class AppContext {
         return currentSettings;
     }
 
+    // --- Реактивные свойства сессии ---
+    public ObjectProperty<AstroWork> activeWorkProperty() {
+        return activeWork;
+    }
 
+    public ObjectProperty<Album> activeAlbumProperty() {
+        return activeAlbum;
+    }
+
+
+    public UserLibrary getUserLibrary() {
+        return userLibrary;
+    }
 }

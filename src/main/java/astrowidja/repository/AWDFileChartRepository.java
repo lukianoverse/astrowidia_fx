@@ -1,7 +1,7 @@
 package astrowidja.repository;
 
 import astrowidja.model.storage.AstroWork;
-import astrowidja.model.storage.WorkList;
+import astrowidja.model.storage.Album;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -53,41 +53,41 @@ public class AWDFileChartRepository implements ChartRepository {
 //    }
 
     @Override
-    public List<WorkList> loadAllLists() throws IOException {
+    public List<Album> loadAllLists() throws IOException {
         return List.of();
     }
 
     @Override
-    public void saveListMetadata(WorkList list) throws IOException {
+    public void saveListMetadata(Album list) throws IOException {
         // Если юзер создал новый пустой список другой кнопочкой — сбрасываем его так же!
         flushListToFile(list);
     }
 
     @Override
-    public void deleteList(WorkList list) throws IOException {
+    public void deleteList(Album list) throws IOException {
 
     }
 
     @Override
-    public void saveWork(AstroWork work, WorkList targetList) throws IOException {
+    public void saveWork(AstroWork work, Album targetList) throws IOException {
         // Для плоского файла сохранение работы — это сброс целевого списка целиком
         flushListToFile(targetList);
     }
 
     @Override
-    public void deleteWork(AstroWork work, WorkList sourceList) throws IOException {
+    public void deleteWork(AstroWork work, Album sourceList) throws IOException {
 
     }
 
     @Override
-    public void moveWork(AstroWork work, WorkList sourceList, WorkList targetList) throws IOException {
+    public void moveWork(AstroWork work, Album sourceList, Album targetList) throws IOException {
 
     }
 
     /**
      * Атомарная запись состояния списка в файл на диске.
      */
-    private void flushListToFile(WorkList list) throws IOException {
+    private void flushListToFile(Album list) throws IOException {
         String safeTitle = list.getTitle().replaceAll("[^a-zA-Zа-яА-Я0-9_\\-]", "_");
         String fileName = "%s__%s.awd".formatted(safeTitle, list.getId());
         Path targetFile = storageDir.resolve(fileName);

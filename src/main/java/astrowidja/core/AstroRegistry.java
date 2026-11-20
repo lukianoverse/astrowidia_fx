@@ -5,10 +5,8 @@ import astrowidja.model.LilithType;
 import astrowidja.model.NodeType;
 import javafx.collections.ObservableList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static swisseph.SweConst.*;
 
@@ -37,11 +35,14 @@ public class AstroRegistry {
     };
 
     public List<AstroEntity> getEntitiesToCalculate() {
-        return AppContext.getInstance()
+        Set<String> selected = AppContext.getInstance()
                 .getCurrentSettings().getAstrasToCalculate().stream()
-                .map(this::findByName)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .map(String::trim)
+                .filter(name -> !name.isEmpty())
+                .collect(Collectors.toSet());
+
+        return registry.stream()
+                .filter(entity -> selected.stream().anyMatch(entity::matches))
                 .toList();
     }
 

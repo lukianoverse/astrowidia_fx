@@ -1,8 +1,7 @@
 package astrowidja.service;
 
 import astrowidja.model.storage.AstroWork;
-import astrowidja.service.UserLibrary;
-import astrowidja.model.storage.WorkList;
+import astrowidja.model.storage.Album;
 import astrowidja.repository.ChartRepository;
 
 import java.io.IOException;
@@ -22,14 +21,14 @@ public class LibraryService {
      * Сценарий 1 (Онтогенез): Сохранение работы без явного выбора списка.
      */
     public void saveWorkToDefault(AstroWork work) throws IOException {
-        WorkList defaultList = getOrCreateDefaultList();
+        Album defaultList = getOrCreateDefaultList();
         saveWork(work, defaultList);
     }
 
     /**
      * Сценарий 2: Сохранение работы в конкретный, выбранный пользователем список.
      */
-    public void saveWork(AstroWork work, WorkList targetList) throws IOException {
+    public void saveWork(AstroWork work, Album targetList) throws IOException {
         if (!targetList.getWorks().contains(work)) {
             targetList.getWorks().add(work);
         }
@@ -43,16 +42,16 @@ public class LibraryService {
     /**
      * Ищет список "Карты", а если его нет в природе — творит его.
      */
-    private WorkList getOrCreateDefaultList() throws IOException {
+    private Album getOrCreateDefaultList() throws IOException {
         // Сначала ищем среди уже существующих в памяти списков
-        return library.getAllLists().stream()
+        return library.getAllAlbums().stream()
                 .filter(list -> list.getTitle().equalsIgnoreCase(DEFAULT_LIST_TITLE))
                 .findFirst()
                 .orElseGet(() -> {
                     // Если списка нет (самый первый запуск) — создаем!
-                    WorkList newList = new WorkList(DEFAULT_LIST_TITLE);
+                    Album newList = new Album(DEFAULT_LIST_TITLE);
                     newList.setComment("Основной список карт по умолчанию");
-                    library.registerList(newList);
+                    library.registerAlbum(newList);
                     return newList;
                 });
     }

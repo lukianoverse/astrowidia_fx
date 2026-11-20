@@ -94,18 +94,21 @@ public class AstrasController {
         CheckBox checkBox = new CheckBox();
 
         // отмечаем астру согласно текущим Настройкам
-        ObservableList<String> activeNames = currentSettings.getAstrasToCalculate();
-        checkBox.setSelected(activeNames.contains(entity.getName()));
+        var activeNames = currentSettings.getAstrasToCalculate();
+        // Отмечаем астру по matches(): учитываются имя, псевдонимы и символ.
+        // Это устраняет рассинхрон, если в ini лежит алиас или астра переименована.
+        checkBox.setSelected(activeNames.stream().anyMatch(entity::matches));
 
         // связываем с актуальным состоянием галочки
         checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                // галочка прилетела → добавляем имя в настройки, если его там нет
-                if (!activeNames.contains(entity.getName()))
+                // галочка прилетела → добавляем имя в настройки, Set сам отсеет дубли
+                // если ни одно из текущих имён не матчится — кладём каноническое
+                if (activeNames.stream().noneMatch(entity::matches))
                     activeNames.add(entity.getName());
             } else {
-                // галочка улетела -> убираем имя из настроек
-                activeNames.remove(entity.getName());
+                // снятие галочки — вычищаем ВСЕ совпавшие имена (и канон, и псевдонимы)
+                activeNames.removeIf(entity::matches);
             }
         });
 
@@ -120,11 +123,13 @@ public class AstrasController {
         boolean calculatable = isCalculatable(entity.getSwissId());
 
         if (!calculatable) {
-            // Если файла нет — гасим этот объект
+            // Если объект не вычисляется текущими ресурсами — гасим его
             lblSymbol.setStyle("-fx-text-fill: #444444; -fx-font-size: 18; -fx-min-width: 25;");
             lblName.setStyle("-fx-text-fill: #555555; -fx-font-size: 15;");
+            // сначала чистим настройки (по matches), потом гасим галочку и контрол
+            activeNames.removeIf(entity::matches);
+            checkBox.setSelected(false);
             checkBox.setDisable(true);
-            activeNames.remove(entity.getName()); // Убираем из расчёта
         }
 
         row.getChildren().addAll(checkBox, lblSymbol, lblName);

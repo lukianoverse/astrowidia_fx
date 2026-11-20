@@ -1,27 +1,27 @@
 package astrowidja.service;
 
 import astrowidja.model.storage.AstroWork;
-import astrowidja.model.storage.WorkList;
+import astrowidja.model.storage.Album;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class UserLibrary {
 
 
-    private final List<WorkList> lists = new ArrayList<>();
+    private final List<Album> lists = new ArrayList<>();
 
-
-    public List<WorkList> getAllLists() {
-        return lists;
-    }
 
     public void indexWork(AstroWork work) {
         
     }
 
-    public void registerList(WorkList newList) {
+    public void registerAlbum(Album newList) {
         lists.add(newList);
+    }
+
+    public List<Album> getAllAlbums() {
+        return lists;
+
     }
 }

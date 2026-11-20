@@ -8,7 +8,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
+
+import java.util.LinkedHashSet;
 
 public class Settings {
     // значения по умолчанию заданы изначально
@@ -32,8 +34,8 @@ public class Settings {
             = new SimpleObjectProperty<>(LilithType.MEAN);
 
     // --- Астры, идущие в расчёт ---
-    private final ObservableList<String> astrasToCalculate
-            = FXCollections.observableArrayList();
+    private final ObservableSet<String> astrasToCalculate
+            = FXCollections.observableSet(new LinkedHashSet<>());
 
     /**
      * Создаёт объект режима вычислений на основе текущих настроек.
@@ -50,7 +52,7 @@ public class Settings {
 
     // ==================== Properties / Getters / Setters ====================
 
-    public ObservableList<String> getAstrasToCalculate() {
+    public ObservableSet<String> getAstrasToCalculate() {
         return astrasToCalculate;
     }
 
